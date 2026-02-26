@@ -51,7 +51,8 @@ export async function regionalEconomyFull(params: {
     tasks.push(
       boj.getTimeSeriesData({
         seriesCode: "PR01'PRCPI01",
-        fromYear: (params.year || new Date().getFullYear()) - 5,
+        db: 'PR',
+        freq: 'M',
       }).then(r => ({ label: 'cpi', result: r }))
     );
 

@@ -8,7 +8,7 @@
 import { fetchJson, buildUrl, CacheTTL } from '../utils/http.js';
 import type { ApiResponse } from '../utils/http.js';
 
-const BASE_URL = 'https://mirasapo-plus.go.jp/api/v1';
+const BASE_URL = 'https://mirasapo-plus.go.jp/jirei-api';
 
 /** 成功事例検索 */
 export async function searchCaseStudies(params: {
@@ -21,7 +21,7 @@ export async function searchCaseStudies(params: {
   limit?: number;
   offset?: number;
 }): Promise<ApiResponse> {
-  const url = buildUrl(`${BASE_URL}/cases`, {
+  const url = buildUrl(`${BASE_URL}/case_studies`, {
     keywords: params.keywords,
     prefecture: params.prefecture,
     industry_category: params.industryCategory,
@@ -41,7 +41,7 @@ export async function searchCaseStudies(params: {
 export async function getCaseStudy(params: {
   id: string;
 }): Promise<ApiResponse> {
-  return fetchJson(`${BASE_URL}/cases/${params.id}`, {
+  return fetchJson(`${BASE_URL}/case_studies/${params.id}`, {
     source: 'ミラサポplus/detail',
     cacheTtl: CacheTTL.DATA,
   });

@@ -966,11 +966,12 @@ server.tool('ndb_range_labels',
 server.tool('boj_timeseries',
   '【日本銀行】時系列統計データ取得。マネーストック・物価指数・為替レート等（APIキー不要・2026/2/18開始）',
   {
-    seriesCode: z.string().describe('時系列コード（例: "MD02\'MAAMAG" = M2, "FEXXUSJP" = USD/JPY為替レート）'),
-    fromYear: z.number().optional().describe('開始年（デフォルト: 過去10年）'),
-    toYear: z.number().optional().describe('終了年（デフォルト: 今年）'),
-    frequency: z.enum(['MM', 'QQ', 'AA']).optional().describe('頻度: MM=月次 QQ=四半期 AA=年次（デフォルト: MM）'),
-    format: z.enum(['CSV', 'JSON']).optional().describe('レスポンス形式（デフォルト: CSV）'),
+    seriesCode: z.string().describe('時系列コード（例: "STRDCLUCON" = コールレート, "TK99F0000601GCQ00000" = 短観DI）'),
+    db: z.string().optional().describe('データベースコード（例: FM01, CO, MD, PR）'),
+    freq: z.string().optional().describe('頻度: D=日次 M=月次 Q=四半期 A=年次（デフォルト: M）'),
+    startDate: z.string().optional().describe('開始年月 YYYYMM形式（デフォルト: 1年前）'),
+    endDate: z.string().optional().describe('終了年月 YYYYMM形式（デフォルト: 今月）'),
+    format: z.enum(['json', 'csv']).optional().describe('レスポンス形式（デフォルト: json）'),
   },
   async (p) => formatResponse(await boj.getTimeSeriesData(p))
 );

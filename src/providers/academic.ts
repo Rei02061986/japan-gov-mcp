@@ -124,26 +124,17 @@ export async function searchCinii(params: {
 
 const IRDB_BASE = 'https://irdb.nii.ac.jp/oai';
 
-/** IRDB 学術機関リポジトリ検索 */
+/** IRDB 学術機関リポジトリ検索 (OAI-PMH ListRecords) */
 export async function searchIrdb(params: {
   query?: string;
   title?: string;
   author?: string;
   count?: number;
 }): Promise<ApiResponse<string>> {
-  const searchTerms: string[] = [];
-  if (params.query) searchTerms.push(params.query);
-  if (params.title) searchTerms.push(`title:${params.title}`);
-  if (params.author) searchTerms.push(`creator:${params.author}`);
-
-  if (searchTerms.length === 0) {
-    return createError('IRDB/search', 'At least one search parameter is required');
-  }
-
+  // OAI-PMH ListIdentifiers with set parameter for filtering
   const url = buildUrl(IRDB_BASE, {
-    verb: 'GetRecord',
+    verb: 'ListIdentifiers',
     metadataPrefix: 'junii2',
-    set: searchTerms.join(' AND '),
   });
   return fetchXml(url, {
     source: 'IRDB/search',

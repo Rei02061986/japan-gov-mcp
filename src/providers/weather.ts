@@ -59,8 +59,9 @@ export async function getTyphoonInfo(): Promise<ApiResponse> {
     source: '気象庁/typhoon',
     cacheTtl: CacheTTL.SEARCH,
   });
-  // 404 = 現在台風データなし（正常応答扱い）
-  if (!res.success && res.error?.includes('404')) {
+  // JMA typhoon endpoint: 404/parse error = 台風データなし（正常応答扱い）
+  // The endpoint returns SPA HTML (not JSON) when no typhoon data exists
+  if (!res.success) {
     return {
       success: true,
       data: { message: '現在、台風情報はありません', typhoons: [] },

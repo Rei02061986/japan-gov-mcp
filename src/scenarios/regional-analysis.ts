@@ -39,8 +39,8 @@ export async function regionalHealthEconomy(params: {
       // 日銀マクロ: CPI
       boj.getTimeSeriesData({
         seriesCode: "PR01'PRCPI01",
-        fromYear: (params.year || new Date().getFullYear()) - 5,
-        toYear: params.year || new Date().getFullYear(),
+        db: 'PR',
+        freq: 'M',
       }),
     ]);
 

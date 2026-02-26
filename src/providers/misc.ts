@@ -90,11 +90,10 @@ export async function getDashboardIndicators(params: {
   indicatorCode?: string;
   lang?: string;
 }): Promise<ApiResponse<DashboardResponse>> {
+  // NOTE: MetaGetFlg パラメータを含めるとWAF/CDNが404を返すため除外
   const url = buildUrl(`${DASHBOARD_BASE}/Json/getIndicatorInfo`, {
     Lang: params.lang || 'JP',
     IndicatorCode: params.indicatorCode,
-    MetaGetFlg: 'Y',
-    IsSeasonalAdjustment: '1',
   });
   return fetchJson<DashboardResponse>(url, {
     source: '統計ダッシュボード/indicatorInfo',
@@ -113,13 +112,13 @@ export async function getDashboardData(params: {
   if (!params.indicatorCode?.trim()) {
     return createError('統計ダッシュボード/statsData', 'indicatorCode is required');
   }
-  const url = buildUrl(`${DASHBOARD_BASE}/Json/getStatsData`, {
+  // NOTE: MetaGetFlg パラメータを含めるとWAF/CDNが404を返すため除外
+  const url = buildUrl(`${DASHBOARD_BASE}/Json/getData`, {
     Lang: params.lang || 'JP',
     IndicatorCode: params.indicatorCode,
     RegionCode: params.regionCode,
     TimeCdFrom: params.timeCdFrom,
     TimeCdTo: params.timeCdTo,
-    MetaGetFlg: 'Y',
   });
   return fetchJson<DashboardResponse>(url, {
     source: '統計ダッシュボード/statsData',
