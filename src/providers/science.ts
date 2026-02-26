@@ -12,18 +12,37 @@ import type { ApiResponse } from '../utils/http.js';
 // https://soramame.env.go.jp/
 // ═══════════════════════════════════════════════
 
-const SORAMAME_BASE = 'https://soramame.env.go.jp/soramame/api/v1';
+const SORAMAME_BASE = 'https://soramame.env.go.jp/soramame/api';
 
-/** 大気汚染リアルタイムデータ取得 */
+/**
+ * 大気汚染データ検索
+ * @param params.prefCode - 都道府県コード 01-47（必須）
+ * @param params.startYM - 開始年月 YYYYMM（省略時は今月）
+ * @param params.endYM - 終了年月 YYYYMM（省略時は今月）
+ * @param params.stationCode - 測定局コード（カンマ区切りで複数可）
+ * @param params.dataItems - データ項目（カンマ区切り: PM2_5,OX,NO2,SO2,CO,SPM,TEMP等）
+ */
 export async function getAirQuality(params: {
+  prefCode?: string;
+  startYM?: string;
+  endYM?: string;
   stationCode?: string;
+  dataItems?: string;
 }): Promise<ApiResponse> {
-  const url = params.stationCode
-    ? buildUrl(`${SORAMAME_BASE}/stations/${params.stationCode}/latest`, {})
-    : `${SORAMAME_BASE}/latest`;
+  const now = new Date();
+  const currentYM = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const prefCode = params.prefCode || '13'; // default: Tokyo
+  const url = buildUrl(`${SORAMAME_BASE}/data_search`, {
+    Start_YM: params.startYM || currentYM,
+    End_YM: params.endYM,
+    TDFKN_CD: prefCode,
+    SKT_CD: params.stationCode,
+    REQUEST_DATA: params.dataItems || 'PM2_5',
+  });
   return fetchJson(url, {
     source: 'そらまめくん/air_quality',
     cacheTtl: CacheTTL.SEARCH,
+    timeout: 30000, // slow API
   });
 }
 
@@ -66,26 +85,17 @@ export async function getGeologyAtPoint(params: {
 }
 
 // ═══════════════════════════════════════════════
-// JAXA G-Portal / Earth API
-// https://gportal.jaxa.jp/
+// JAXA Earth API (STAC 1.0.0)
+// https://data.earth.jaxa.jp/
 // ═══════════════════════════════════════════════
 
-const JAXA_BASE = 'https://gportal.jaxa.jp/csw/csw';
+const JAXA_STAC_URL = 'https://data.earth.jaxa.jp/stac/cog/v1/catalog.json';
 
-/** JAXA衛星データコレクション一覧 */
+/** JAXA衛星データコレクション一覧 (STAC Catalog) */
 export async function getJaxaCollections(params: {
   limit?: number;
 }): Promise<ApiResponse> {
-  const url = buildUrl(JAXA_BASE, {
-    service: 'CSW',
-    version: '3.0.0',
-    request: 'GetRecords',
-    resultType: 'results',
-    outputFormat: 'application/json',
-    maxRecords: params.limit || 20,
-    typeNames: 'csw:Record',
-  });
-  return fetchJson(url, {
+  return fetchJson(JAXA_STAC_URL, {
     source: 'JAXA/collections',
     cacheTtl: CacheTTL.MASTER,
   });

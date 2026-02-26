@@ -118,9 +118,11 @@ describe('Group 1: No-Auth APIs', { timeout: 300000 }, () => {
     assert.ok(res.success, res.error);
   });
 
-  // ── 浸水ナビ ── (API decommissioned — suiboumap.gsi.go.jp returns 404)
-  it('flood_depth — 東京駅の浸水想定', async () => {
-    track('国土地理院', 'flood_depth', 'SKIP', '浸水ナビAPI廃止（suiboumap.gsi.go.jp 404）');
+  // ── 浸水ナビ ── (GetBreakPointMaxDepth)
+  it('flood_depth — 大阪・淀川付近の浸水想定', async () => {
+    const res = await disaster.getFloodDepth({ lat: 34.7, lon: 135.5 });
+    track('国土地理院', 'flood_depth', res.success ? 'PASS' : 'FAIL', res.success ? 'OK' : res.error!);
+    assert.ok(res.success, res.error);
   });
 
   // ── 河川水位 ── (river.go.jp blocks automated access, returns HTML)
@@ -128,9 +130,11 @@ describe('Group 1: No-Auth APIs', { timeout: 300000 }, () => {
     track('国交省', 'river_level', 'SKIP', '河川水位情報サイトは自動アクセスをブロック');
   });
 
-  // ── 交通量 ── (JARTIC has no public WFS endpoint)
-  it('traffic_volume — 東京の交通量', async () => {
-    track('国交省', 'traffic_volume', 'SKIP', 'JARTIC WFSエンドポイント非公開');
+  // ── 交通量 ── (JARTIC Open Traffic WFS 2.0)
+  it('traffic_volume — 東京都心の交通量', async () => {
+    const res = await disaster.getTrafficVolume({ lat: 35.68, lon: 139.77, count: 3 });
+    track('国交省', 'traffic_volume', res.success ? 'PASS' : 'FAIL', res.success ? 'OK' : res.error!);
+    assert.ok(res.success, res.error);
   });
 
   // ── 国土地理院 ジオコーディング ──
@@ -281,9 +285,11 @@ describe('Group 1: No-Auth APIs', { timeout: 300000 }, () => {
     assert.ok(res.success, res.error);
   });
 
-  // ── 環境省 そらまめくん ── (SPA only, no public REST API)
-  it('soramame_air — 大気汚染データ', async () => {
-    track('環境省', 'soramame_air', 'SKIP', 'そらまめくんはSPAのみ（REST API非公開）');
+  // ── 環境省 そらまめくん ──
+  it('soramame_air — 東京都PM2.5データ', async () => {
+    const res = await getAirQuality({ prefCode: '13', dataItems: 'PM2_5' });
+    track('環境省', 'soramame_air', res.success ? 'PASS' : 'FAIL', res.success ? 'OK' : res.error!);
+    assert.ok(res.success, res.error);
   });
 
   // ── 産総研 地質図 ──
@@ -299,26 +305,33 @@ describe('Group 1: No-Auth APIs', { timeout: 300000 }, () => {
     assert.ok(res.success, res.error);
   });
 
-  // ── JAXA ── (CSW endpoint timeout — gportal.jaxa.jp very slow)
-  it('jaxa_collections — 衛星データ一覧', async () => {
-    track('JAXA', 'jaxa_collections', 'SKIP', 'JAXA G-Portal CSWタイムアウト（30秒超）');
+  // ── JAXA Earth API (STAC) ──
+  it('jaxa_collections — 衛星データ一覧 (STAC)', async () => {
+    const res = await getJaxaCollections({});
+    track('JAXA', 'jaxa_collections', res.success ? 'PASS' : 'FAIL', res.success ? 'OK' : res.error!);
+    assert.ok(res.success, res.error);
   });
 
-  // ── NDBオープンデータ ── (ndbopendata-hub.com is a third-party service, currently down)
+  // ── NDBオープンデータ ──
   it('ndb_items — 検査項目一覧', async () => {
-    track('NDB', 'ndb_items', 'SKIP', 'ndbopendata-hub.comサービス停止中（サードパーティ）');
+    const res = await ndb.getItems();
+    track('NDB', 'ndb_items', res.success ? 'PASS' : 'FAIL', res.success ? 'OK' : res.error!);
+    assert.ok(res.success, res.error);
   });
 
   it('ndb_areas — 都道府県一覧', async () => {
-    track('NDB', 'ndb_areas', 'SKIP', 'ndbopendata-hub.comサービス停止中（サードパーティ）');
+    const res = await ndb.getAreas({ type: 'prefecture' });
+    track('NDB', 'ndb_areas', res.success ? 'PASS' : 'FAIL', res.success ? 'OK' : res.error!);
+    assert.ok(res.success, res.error);
   });
 
+  // NDB data query endpoints have temporary server-side bug (SQL error)
   it('ndb_range_labels — BMI範囲ラベル', async () => {
-    track('NDB', 'ndb_range_labels', 'SKIP', 'ndbopendata-hub.comサービス停止中（サードパーティ）');
+    track('NDB', 'ndb_range_labels', 'SKIP', 'NDB Hub一時的サーバーエラー（SQLクエリ制限）');
   });
 
   it('ndb_inspection_stats — BMI統計データ', async () => {
-    track('NDB', 'ndb_inspection_stats', 'SKIP', 'ndbopendata-hub.comサービス停止中（サードパーティ）');
+    track('NDB', 'ndb_inspection_stats', 'SKIP', 'NDB Hub一時的サーバーエラー（SQLクエリ制限）');
   });
 
   // ── 日本銀行 ──

@@ -650,11 +650,10 @@ server.tool('jma_tsunami',
 );
 
 server.tool('flood_depth',
-  '【浸水ナビ/国土地理院】指定座標の洪水浸水想定深さ・ハザード情報取得',
+  '【浸水ナビ/国土地理院】指定座標の破堤点・最大洪水浸水深を取得。河川近くの座標で破堤シミュレーション情報が得られる',
   {
     lat: z.number().describe('緯度 24〜46'),
     lon: z.number().describe('経度 122〜154'),
-    groupType: z.number().optional().describe('0=国管理（デフォルト） / 1=県管理'),
   },
   async (p) => formatResponse(await disaster.getFloodDepth(p))
 );
@@ -668,12 +667,13 @@ server.tool('river_level',
 );
 
 server.tool('traffic_volume',
-  '【国交省/JARTIC】指定地点周辺の道路交通量データ取得',
+  '【国交省/JARTIC】指定地点周辺の道路交通量データ取得（WFS 2.0 CSV形式）。常時観測点の1時間or5分間交通量',
   {
     lat: z.number().describe('緯度 -90〜90'),
     lon: z.number().describe('経度 -180〜180'),
-    radius: z.number().optional().describe('検索半径（m、デフォルト1000）'),
+    radius: z.number().optional().describe('検索半径（m、デフォルト5000）'),
     count: z.number().optional().describe('取得件数（デフォルト10）'),
+    interval: z.enum(['1h', '5m']).optional().describe('集計間隔: 1h=1時間（デフォルト） 5m=5分間'),
   },
   async (p) => formatResponse(await disaster.getTrafficVolume(p))
 );
@@ -796,8 +796,14 @@ server.tool('kkj_search',
 );
 
 server.tool('soramame_air',
-  '【環境省】大気汚染リアルタイムデータ（そらまめくん）（APIキー不要）',
-  { stationCode: z.string().optional().describe('測定局コード（省略時は全局最新値）') },
+  '【環境省】大気汚染データ検索（そらまめくん）。都道府県コード指定でPM2.5・OX・NO2等の時系列データを取得（APIキー不要）',
+  {
+    prefCode: z.string().optional().describe('都道府県コード01-47（デフォルト: 13=東京）'),
+    startYM: z.string().optional().describe('開始年月 YYYYMM（デフォルト: 今月）'),
+    endYM: z.string().optional().describe('終了年月 YYYYMM'),
+    stationCode: z.string().optional().describe('測定局コード（カンマ区切りで複数可）'),
+    dataItems: z.string().optional().describe('データ項目（カンマ区切り: PM2_5,OX,NO2,SO2,CO,SPM,TEMP 等）'),
+  },
   async (p) => formatResponse(await getAirQuality(p))
 );
 
@@ -928,7 +934,7 @@ server.tool('ndb_inspection_stats',
     areaType: z.enum(['prefecture', 'secondary_medical_area']).optional().describe('地域種別: prefecture=都道府県 secondary_medical_area=二次医療圏'),
     prefectureName: z.string().optional().describe('都道府県名（例: 東京都）'),
     areaName: z.string().optional().describe('二次医療圏名'),
-    gender: z.enum(['male', 'female', 'all']).optional().describe('性別'),
+    gender: z.enum(['M', 'F', 'all']).optional().describe('性別: M=男性 F=女性 all=全体'),
     ageGroup: z.string().optional().describe('年齢階級（例: 40-44, 45-49, 50-54）'),
     page: z.number().optional().describe('ページ番号'),
     perPage: z.number().optional().describe('1ページあたり件数'),
@@ -954,7 +960,7 @@ server.tool('ndb_range_labels',
   '【NDBオープンデータ】検査項目の値範囲ラベル取得（例: BMI「18.5未満」「18.5以上25未満」等）（APIキー不要）',
   {
     itemName: z.string().describe('検査項目名'),
-    gender: z.enum(['male', 'female', 'all']).optional().describe('性別'),
+    gender: z.enum(['M', 'F', 'all']).optional().describe('性別: M=男性 F=女性 all=全体'),
   },
   async (p) => formatResponse(await ndb.getRangeLabels(p))
 );
@@ -988,7 +994,7 @@ server.tool('ndb_hub_proxy',
     query: z.string().describe('自然言語クエリ（例: "東京都のBMI分布"）'),
     prefectureCode: z.string().optional().describe('都道府県コード2桁'),
     indicator: z.string().optional().describe('指標名（例: "BMI", "HbA1c"）'),
-    gender: z.enum(['male', 'female', 'all']).optional().describe('性別'),
+    gender: z.enum(['M', 'F', 'all']).optional().describe('性別: M=男性 F=女性 all=全体'),
     ageClass: z.string().optional().describe('年齢階級（例: "40-44"）'),
   },
   async (p) => formatResponse(await ndb.ndbHubProxy(p))

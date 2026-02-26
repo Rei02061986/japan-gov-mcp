@@ -18,11 +18,11 @@ const BASE_URL = 'https://ndbopendata-hub.com/api/v1';
  */
 export async function getInspectionStats(params: {
   itemName: string;           // 必須: 検査項目名（例: "BMI", "収縮期血圧"）
-  recordMode?: string;        // inspection (デフォルト)
+  recordMode?: string;        // basic/detailed/all (デフォルト: basic)
   areaType?: string;          // prefecture (都道府県) or secondary_medical_area (二次医療圏)
   prefectureName?: string;    // 都道府県名
   areaName?: string;          // 二次医療圏名
-  gender?: string;            // male/female/all
+  gender?: string;            // M/F/all
   ageGroup?: string;          // 40-44, 45-49, ...
   valueRange?: string;        // 検査値範囲
   page?: number;
@@ -37,11 +37,11 @@ export async function getInspectionStats(params: {
 
   const url = buildUrl(`${BASE_URL}/inspection-stats`, {
     item_name: params.itemName.trim(),
-    record_mode: params.recordMode || 'inspection',
+    record_mode: params.recordMode || 'basic',
     area_type: params.areaType,
     prefecture_name: params.prefectureName,
     area_name: params.areaName,
-    gender: params.gender,
+    gender: params.gender,  // M/F/all
     age_group: params.ageGroup,
     value_range: params.valueRange,
     page: params.page,
@@ -103,8 +103,8 @@ export async function getRangeLabels(params: {
 
   const url = buildUrl(`${BASE_URL}/range-labels`, {
     item_name: params.itemName.trim(),
-    record_mode: params.recordMode || 'inspection',
-    gender: params.gender,
+    record_mode: params.recordMode || 'basic',
+    gender: params.gender,  // M/F/all
   });
 
   return fetchJson<unknown>(url, {
