@@ -3,7 +3,7 @@
  * APIキー不要のものを中心に、小規模Providerをまとめて管理
  */
 
-import { fetchJson, buildUrl, createError, CacheTTL } from '../utils/http.js';
+import { fetchJson, fetchXml, buildUrl, createError, CacheTTL } from '../utils/http.js';
 import type { ApiResponse } from '../utils/http.js';
 
 // ═══════════════════════════════════════════════
@@ -73,6 +73,11 @@ export async function searchLawsByKeyword(params: {
 
 const DASHBOARD_BASE = 'https://dashboard.e-stat.go.jp/api/1.0';
 
+/** WAF/CDNがUser-Agentなしのリクエストをブロックするため、ブラウザ風ヘッダーを付与 */
+const DASHBOARD_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+};
+
 export interface DashboardResponse {
   GET_INDICATOR_INFO?: Record<string, unknown>;
   GET_STATS_DATA?: Record<string, unknown>;
@@ -91,7 +96,10 @@ export async function getDashboardIndicators(params: {
     MetaGetFlg: 'Y',
     IsSeasonalAdjustment: '1',
   });
-  return fetchJson<DashboardResponse>(url, { source: '統計ダッシュボード/indicatorInfo' });
+  return fetchJson<DashboardResponse>(url, {
+    source: '統計ダッシュボード/indicatorInfo',
+    headers: DASHBOARD_HEADERS,
+  });
 }
 
 /** 統計データ取得 */
@@ -113,7 +121,10 @@ export async function getDashboardData(params: {
     TimeCdTo: params.timeCdTo,
     MetaGetFlg: 'Y',
   });
-  return fetchJson<DashboardResponse>(url, { source: '統計ダッシュボード/statsData' });
+  return fetchJson<DashboardResponse>(url, {
+    source: '統計ダッシュボード/statsData',
+    headers: DASHBOARD_HEADERS,
+  });
 }
 
 // ═══════════════════════════════════════════════
@@ -221,26 +232,26 @@ export async function listOrganizations(): Promise<ApiResponse<CkanResponse>> {
 
 // ═══════════════════════════════════════════════
 // 海外安全情報オープンデータ (外務省) - APIキー不要
-// https://www.anzen.mofa.go.jp/
+// https://www.ezairyu.mofa.go.jp/html/opendata/index.html
 // ═══════════════════════════════════════════════
 
-const ANZEN_BASE = 'https://www.anzen.mofa.go.jp/od';
+const ANZEN_BASE = 'https://www.ezairyu.mofa.go.jp/opendata';
 
 export interface SafetyInfoResponse {
   [key: string]: unknown;
 }
 
-/** 海外安全情報取得 */
+/** 海外安全情報取得 (XML) */
 export async function getSafetyInfo(params: {
   regionCode?: string;
   countryCode?: string;
-}): Promise<ApiResponse<SafetyInfoResponse>> {
+}): Promise<ApiResponse<string>> {
   const url = params.countryCode
-    ? `${ANZEN_BASE}/areaspecific/${params.countryCode}.json`
+    ? `${ANZEN_BASE}/country/${params.countryCode}.xml`
     : params.regionCode
-      ? `${ANZEN_BASE}/areaspecific/region${params.regionCode}.json`
-      : `${ANZEN_BASE}/allcountry.json`;
-  return fetchJson<SafetyInfoResponse>(url, {
+      ? `${ANZEN_BASE}/area/${params.regionCode}.xml`
+      : `${ANZEN_BASE}/area/newarrival.xml`;
+  return fetchXml(url, {
     source: '海外安全情報',
     cacheTtl: params.countryCode || params.regionCode ? CacheTTL.DATA : CacheTTL.MASTER,
   });
@@ -279,21 +290,21 @@ export async function searchJobs(config: HelloworkConfig, params: {
 // AgriKnowledge (農研機構) - APIキー不要
 // ═══════════════════════════════════════════════
 
-const AGRI_BASE = 'https://agriknowledge.affrc.go.jp/api/v1';
+const AGRI_BASE = 'https://agriknowledge.affrc.go.jp/api';
 
-/** 農業技術・試験研究成果を検索 */
+/** 農業技術・試験研究成果を検索 (OpenSearch XML) */
 export async function searchAgriKnowledge(params: {
   query: string;
   count?: number;
-}): Promise<ApiResponse> {
+}): Promise<ApiResponse<string>> {
   if (!params.query?.trim()) {
     return createError('AgriKnowledge/search', 'query is required');
   }
-  const url = buildUrl(`${AGRI_BASE}/search`, {
+  const url = buildUrl(`${AGRI_BASE}/opensearch`, {
     q: params.query,
-    count: params.count || 20,
+    cnt: params.count || 20,
   });
-  return fetchJson(url, {
+  return fetchXml(url, {
     source: 'AgriKnowledge/search',
     cacheTtl: CacheTTL.SEARCH,
   });

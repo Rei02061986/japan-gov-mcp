@@ -8,7 +8,7 @@
 import { fetchXml, buildUrl, CacheTTL } from '../utils/http.js';
 import type { ApiResponse } from '../utils/http.js';
 
-const BASE_URL = 'https://www.kkj.go.jp/api/search';
+const BASE_URL = 'https://www.kkj.go.jp/api/';
 
 /** 官公需情報 入札・調達案件検索 */
 export async function searchKkj(params: {

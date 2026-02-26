@@ -205,8 +205,8 @@ describe('Group 1: No-Auth APIs', { timeout: 300000 }, () => {
   });
 
   // ── 海外安全情報 ──
-  it('safety_overseas — 米国の安全情報', async () => {
-    const res = await getSafetyInfo({ countryCode: '0001' });
+  it('safety_overseas — インドの安全情報', async () => {
+    const res = await getSafetyInfo({ countryCode: '0091' });
     track('外務省', 'safety_overseas', res.success ? 'PASS' : 'FAIL', res.success ? 'OK' : res.error!);
     assert.ok(res.success, res.error);
   });

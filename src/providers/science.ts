@@ -4,7 +4,7 @@
  * APIキー不要
  */
 
-import { fetchJson, buildUrl, CacheTTL } from '../utils/http.js';
+import { fetchJson, buildUrl, createError, CacheTTL } from '../utils/http.js';
 import type { ApiResponse } from '../utils/http.js';
 
 // ═══════════════════════════════════════════════
@@ -36,7 +36,7 @@ const GEOLOGY_BASE = 'https://gbank.gsj.jp/seamless/v2';
 
 /** 地質図凡例一覧 */
 export async function getGeologyLegend(): Promise<ApiResponse> {
-  return fetchJson(`${GEOLOGY_BASE}/api/1.2/legend.json`, {
+  return fetchJson(`${GEOLOGY_BASE}/api/1.3.1/legend.json`, {
     source: '地質図/legend',
     cacheTtl: CacheTTL.MASTER,
   });
@@ -47,16 +47,19 @@ export async function getGeologyAtPoint(params: {
   lat: number;
   lon: number;
 }): Promise<ApiResponse> {
-  // タイル座標計算 (zoom=14)
-  const z = 14;
-  const latRad = (params.lat * Math.PI) / 180;
-  const n = Math.pow(2, z);
-  const x = Math.floor(((params.lon + 180) / 360) * n);
-  const y = Math.floor(
-    ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n
-  );
-
-  return fetchJson(`${GEOLOGY_BASE}/api/1.2.1/glmap/${z}/${x}/${y}.json`, {
+  if (!Number.isFinite(params.lat) || !Number.isFinite(params.lon)) {
+    return createError('地質図/at_point', 'lat and lon must be finite numbers');
+  }
+  if (params.lat < -90 || params.lat > 90) {
+    return createError('地質図/at_point', 'lat must be between -90 and 90');
+  }
+  if (params.lon < -180 || params.lon > 180) {
+    return createError('地質図/at_point', 'lon must be between -180 and 180');
+  }
+  const url = buildUrl(`${GEOLOGY_BASE}/api/1.3.1/legend.json`, {
+    point: `${params.lat},${params.lon}`,
+  });
+  return fetchJson(url, {
     source: '地質図/at_point',
     cacheTtl: CacheTTL.MASTER,
   });
