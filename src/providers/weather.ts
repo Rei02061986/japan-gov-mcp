@@ -53,12 +53,22 @@ export async function getForecastWeekly(params: {
   });
 }
 
-/** 台風情報取得 */
+/** 台風情報取得（台風がない場合はその旨を返す） */
 export async function getTyphoonInfo(): Promise<ApiResponse> {
-  return fetchJson(`${JMA_BASE}/typhoon/data/targetTyphoon.json`, {
+  const res = await fetchJson(`${JMA_BASE}/typhoon/data/targetTyphoon.json`, {
     source: '気象庁/typhoon',
     cacheTtl: CacheTTL.SEARCH,
   });
+  // 404 = 現在台風データなし（正常応答扱い）
+  if (!res.success && res.error?.includes('404')) {
+    return {
+      success: true,
+      data: { message: '現在、台風情報はありません', typhoons: [] },
+      source: '気象庁/typhoon',
+      timestamp: new Date().toISOString(),
+    };
+  }
+  return res;
 }
 
 /** 地震情報一覧取得 */
@@ -89,7 +99,7 @@ export async function getAmedasStations(): Promise<ApiResponse> {
   });
 }
 
-/** アメダス観測データ取得 */
+/** アメダス観測データ取得（観測所別） */
 export async function getAmedasData(params: {
   pointId: string;
   date?: string;  // YYYYMMDDHH
@@ -98,25 +108,24 @@ export async function getAmedasData(params: {
     return createError('気象庁/amedas_data', 'pointId is required');
   }
 
-  // 最新データの場合は latest を使用
+  // 最新データの場合: 直近3時間ブロックを使用
   if (!params.date) {
-    const latestTime = await fetchJson<Record<string, string>>(`${JMA_BASE}/amedas/data/latest_time.txt`, {
-      source: '気象庁/amedas_latest',
-    });
-    // 直近3時間データを取得
+    // JST = UTC+9 で計算
     const now = new Date();
-    const ymd = now.toISOString().slice(0, 10).replace(/-/g, '');
-    const hh = String(now.getUTCHours()).padStart(2, '0');
-    const dateStr = `${ymd}_${hh}`;
-    return fetchJson(`${JMA_BASE}/amedas/data/map/${dateStr}0000.json`, {
+    const jstMs = now.getTime() + 9 * 60 * 60 * 1000;
+    const jst = new Date(jstMs);
+    const ymd = jst.toISOString().slice(0, 10).replace(/-/g, '');
+    // 3時間ブロックに切り捨て (00,03,06,09,12,15,18,21)
+    const hh = String(Math.floor(jst.getUTCHours() / 3) * 3).padStart(2, '0');
+    return fetchJson(`${JMA_BASE}/amedas/data/point/${params.pointId}/${ymd}_${hh}.json`, {
       source: '気象庁/amedas_data',
       cacheTtl: CacheTTL.SEARCH,
     });
   }
 
-  // 指定日時データ
+  // 指定日時データ (YYYYMMDDHH → YYYYMMDD_HH)
   const dateFormatted = params.date.slice(0, 8) + '_' + params.date.slice(8, 10);
-  return fetchJson(`${JMA_BASE}/amedas/data/map/${dateFormatted}0000.json`, {
+  return fetchJson(`${JMA_BASE}/amedas/data/point/${params.pointId}/${dateFormatted}.json`, {
     source: '気象庁/amedas_data',
     cacheTtl: CacheTTL.DATA,
   });
@@ -137,9 +146,9 @@ export async function getSeismicHazard(params: {
   if (params.lat === undefined || params.lon === undefined) {
     return createError('J-SHIS/hazard', 'lat and lon are required');
   }
+  // J-SHIS API requires position=lon,lat (longitude first)
   const url = buildUrl(`${JSHIS_BASE}/pshm/Y2024/AVR/TTL_MTTL/meshinfo.geojson`, {
-    latitude: params.lat,
-    longitude: params.lon,
+    position: `${params.lon},${params.lat}`,
     epsg: 4326,
   });
   return fetchJson(url, {

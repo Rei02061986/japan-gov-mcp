@@ -12,9 +12,9 @@ import type { ApiResponse } from '../utils/http.js';
 // https://iss.ndl.go.jp/information/api/
 // ═══════════════════════════════════════════════
 
-const NDL_BASE = 'https://iss.ndl.go.jp/api/opensearch';
+const NDL_BASE = 'https://ndlsearch.ndl.go.jp/api/opensearch';
 
-/** NDL書籍・雑誌・論文を横断検索 */
+/** NDL書籍・雑誌・論文を横断検索 (RSS/XML) */
 export async function searchNdl(params: {
   query: string;
   count?: number;
@@ -25,9 +25,8 @@ export async function searchNdl(params: {
   const url = buildUrl(NDL_BASE, {
     any: params.query,
     cnt: params.count || 20,
-    format: 'json',
   });
-  return fetchJson(url, {
+  return fetchXml(url, {
     source: 'NDL/search',
     cacheTtl: CacheTTL.SEARCH,
   });

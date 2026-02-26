@@ -44,7 +44,7 @@ export async function getLawData(params: {
   if (!id?.trim()) {
     return createError('法令API/fulltext', 'lawId is required');
   }
-  return fetchJson<ELawsResponse>(`${ELAWS_BASE}/laws/${id}/fulltext`, {
+  return fetchJson<ELawsResponse>(`${ELAWS_BASE}/law_data/${id}`, {
     source: '法令API/fulltext',
   });
 }

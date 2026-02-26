@@ -15,13 +15,15 @@ export async function searchPlateauDatasets(params: {
   city?: string;
   type?: string;
 }): Promise<ApiResponse> {
-  const fqParts = ['tags:PLATEAU'];
-  if (params.prefecture) fqParts.push(`extras_prefecture:${params.prefecture}`);
-  if (params.city) fqParts.push(`extras_city:${params.city}`);
-  if (params.type) fqParts.push(`extras_type:${params.type}`);
+  // fq with AND causes 409 on geospatial.jp CKAN — use q parameter for search terms
+  const qParts = ['PLATEAU'];
+  if (params.prefecture) qParts.push(params.prefecture);
+  if (params.city) qParts.push(params.city);
+  if (params.type) qParts.push(params.type);
 
   const url = buildUrl(`${BASE_URL}/action/package_search`, {
-    fq: fqParts.join(' AND '),
+    q: qParts.join(' '),
+    fq: 'tags:PLATEAU',
     rows: 20,
   });
   return fetchJson(url, {
@@ -38,7 +40,8 @@ export async function getPlateauCitygml(params: {
     return createError('PLATEAU/citygml', 'meshCode is required');
   }
   const url = buildUrl(`${BASE_URL}/action/package_search`, {
-    fq: `tags:PLATEAU AND extras_mesh_code:${params.meshCode}`,
+    q: `PLATEAU ${params.meshCode}`,
+    fq: 'tags:PLATEAU',
     rows: 10,
   });
   return fetchJson(url, {
