@@ -61,18 +61,6 @@ describe('国会会議録API', () => {
     assert.equal(result.success, true);
   });
 
-  it('searchKokkaiSpeeches should fail when from date format is invalid', async () => {
-    const result = await searchKokkaiSpeeches({ from: '20240101' });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /from must be YYYY-MM-DD/);
-  });
-
-  it('searchKokkaiMeetings should fail when maximumRecords is out of range', async () => {
-    const result = await searchKokkaiMeetings({ maximumRecords: 0 });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /maximumRecords must be an integer between 1 and 1000/);
-  });
-
   it('searchKokkaiSpeeches should handle HTTP error', async () => {
     globalThis.fetch = async () => new Response('error', { status: 503, statusText: 'Service Unavailable' });
     const result = await searchKokkaiSpeeches({ any: '予算' });

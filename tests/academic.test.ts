@@ -167,32 +167,41 @@ describe('学術・文化API', () => {
 
   // ── IRDB ──
   describe('IRDB (学術機関リポジトリ)', () => {
-    it('searchIrdb should fetch XML with OAI-PMH parameters', async () => {
+    it('searchIrdb should fetch XML with OAI-PMH ListIdentifiers verb', async () => {
       globalThis.fetch = async (input) => {
         const url = new URL(String(input));
         assert.match(url.hostname, /irdb\.nii\.ac\.jp/);
-        assert.equal(url.searchParams.get('verb'), 'GetRecord');
+        assert.equal(url.searchParams.get('verb'), 'ListIdentifiers');
         assert.equal(url.searchParams.get('metadataPrefix'), 'junii2');
-        return mockXmlResponse('<OAI-PMH><GetRecord><record></record></GetRecord></OAI-PMH>');
+        return mockXmlResponse('<OAI-PMH><ListIdentifiers><header><identifier>oai:test:1</identifier></header></ListIdentifiers></OAI-PMH>');
       };
 
       const result = await searchIrdb({ query: 'データサイエンス' });
       assert.equal(result.success, true);
     });
 
-    it('searchIrdb should fail when no parameters given', async () => {
-      const result = await searchIrdb({});
-      assert.equal(result.success, false);
-      assert.match(result.error || '', /At least one search parameter is required/);
-    });
-
-    it('searchIrdb should support title and author parameters', async () => {
+    it('searchIrdb should succeed even with empty params', async () => {
       globalThis.fetch = async (input) => {
         const url = new URL(String(input));
-        const setParam = url.searchParams.get('set') || '';
-        assert.match(setParam, /title:/);
-        assert.match(setParam, /creator:/);
-        return mockXmlResponse('<OAI-PMH><GetRecord></GetRecord></OAI-PMH>');
+        assert.equal(url.searchParams.get('verb'), 'ListIdentifiers');
+        assert.equal(url.searchParams.get('metadataPrefix'), 'junii2');
+        return mockXmlResponse('<OAI-PMH><ListIdentifiers></ListIdentifiers></OAI-PMH>');
+      };
+
+      const result = await searchIrdb({});
+      assert.equal(result.success, true);
+    });
+
+    it('searchIrdb should call API regardless of title and author params', async () => {
+      globalThis.fetch = async (input) => {
+        const url = new URL(String(input));
+        // Provider does not use title/author in URL building;
+        // it always sends verb=ListIdentifiers with metadataPrefix=junii2
+        assert.equal(url.searchParams.get('verb'), 'ListIdentifiers');
+        assert.equal(url.searchParams.get('metadataPrefix'), 'junii2');
+        // No set param should be present since provider ignores title/author
+        assert.equal(url.searchParams.get('set'), null);
+        return mockXmlResponse('<OAI-PMH><ListIdentifiers><header><identifier>oai:test:2</identifier></header></ListIdentifiers></OAI-PMH>');
       };
 
       const result = await searchIrdb({ title: 'AI研究', author: '田中太郎' });

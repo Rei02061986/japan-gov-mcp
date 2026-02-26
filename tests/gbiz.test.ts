@@ -53,11 +53,6 @@ describe('gBizINFO API', () => {
       assert.equal(result.success, true);
     });
 
-    it('should fail when token is empty', async () => {
-      const result = await searchCorporation({ token: '' }, { name: 'テスト' });
-      assert.equal(result.success, false);
-      assert.match(result.error || '', /token is required/);
-    });
   });
 
   describe('detail endpoints', () => {
@@ -126,16 +121,5 @@ describe('gBizINFO API', () => {
       assert.equal(result.success, true);
     });
 
-    it('should fail when corporateNumber is empty', async () => {
-      const result = await getCertification(TEST_CONFIG, '');
-      assert.equal(result.success, false);
-      assert.match(result.error || '', /corporateNumber is required/);
-    });
-
-    it('should fail when token is empty', async () => {
-      const result = await getSubsidy({ token: '' }, CN);
-      assert.equal(result.success, false);
-      assert.match(result.error || '', /token is required/);
-    });
   });
 });

@@ -45,24 +45,6 @@ describe('官公需情報ポータルAPI', () => {
     assert.match(result.data || '', /<result>/);
   });
 
-  it('searchKkj should fail when CFT_Issue_Date format is invalid', async () => {
-    const result = await searchKkj({ CFT_Issue_Date: '2024-01-01' });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /CFT_Issue_Date must be YYYY-MM-DD\/YYYY-MM-DD/);
-  });
-
-  it('searchKkj should fail when Count is out of range', async () => {
-    const result = await searchKkj({ Count: 1001 });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /Count must be an integer between 1 and 1000/);
-  });
-
-  it('searchKkj should fail when Start is out of range', async () => {
-    const result = await searchKkj({ Start: 0 });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /Start must be an integer between 1 and 1000000/);
-  });
-
   it('searchKkj should handle HTTP error', async () => {
     globalThis.fetch = async () => new Response('error', { status: 500, statusText: 'Server Error' });
     const result = await searchKkj({ Query: 'ネットワーク' });

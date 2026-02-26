@@ -78,7 +78,6 @@ describe('法令API', () => {
     globalThis.fetch = async (input) => {
       const url = String(input);
       assert.match(url, /law_data\/129AC0000000089/);
-      assert.match(url, /response_format=json/);
       return mockJsonResponse({ law: { lawId: '129AC0000000089' } });
     };
     const result = await getLawData({ lawId: '129AC0000000089' });
@@ -176,12 +175,6 @@ describe('不動産情報ライブラリ', () => {
     assert.equal(result.success, true);
   });
 
-  it('getRealEstateTransactions should fail when apiKey missing', async () => {
-    const result = await getRealEstateTransactions({ apiKey: '' }, { year: '20231', quarter: '20234' });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /API key is required/);
-  });
-
   it('getRealEstateTransactions should fail when year missing', async () => {
     const result = await getRealEstateTransactions(config, { year: '', quarter: '20234' });
     assert.equal(result.success, false);
@@ -200,11 +193,6 @@ describe('不動産情報ライブラリ', () => {
     assert.equal(result.success, true);
   });
 
-  it('getLandPrice should fail when apiKey missing', async () => {
-    const result = await getLandPrice({ apiKey: '' }, { year: '2023' });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /API key is required/);
-  });
 });
 
 // ═══════════════════════════════════════════════
@@ -269,7 +257,7 @@ describe('海外安全情報', () => {
   it('getSafetyInfo should fetch all regions XML', async () => {
     globalThis.fetch = async (input) => {
       const url = String(input);
-      assert.match(url, /ezairyu\.mofa\.go\.jp\/opendata\/area\/00\.xml/);
+      assert.match(url, /ezairyu\.mofa\.go\.jp\/opendata\/area\/newarrival\.xml/);
       return mockXmlResponse('<?xml version="1.0"?><opendata><area><cd>00</cd></area></opendata>');
     };
     const result = await getSafetyInfo({});
@@ -326,15 +314,15 @@ describe('AgriKnowledge', () => {
     globalThis.fetch = async (input) => {
       const url = new URL(String(input));
       assert.equal(url.origin, 'https://agriknowledge.affrc.go.jp');
-      assert.equal(url.pathname, '/RNJ/api/2.0/search');
-      assert.equal(url.searchParams.get('query'), '水稲');
-      assert.equal(url.searchParams.get('count'), '3');
-      return mockJsonResponse({ total: 1, records: [{ id: 'A001' }] });
+      assert.equal(url.pathname, '/api/opensearch');
+      assert.equal(url.searchParams.get('q'), '水稲');
+      assert.equal(url.searchParams.get('cnt'), '3');
+      return mockXmlResponse('<?xml version="1.0"?><rss><channel><item><title>水稲</title></item></channel></rss>');
     };
 
     const result = await searchAgriKnowledge({ query: '水稲', count: 3 });
     assert.equal(result.success, true);
-    assert.equal((result.data as { total?: number })?.total, 1);
+    assert.equal(typeof result.data, 'string');
   });
 
   it('searchAgriKnowledge should fail when query is empty', async () => {

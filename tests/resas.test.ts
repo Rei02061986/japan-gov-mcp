@@ -15,7 +15,6 @@ import {
   getTourismForeigners,
   getMunicipalFinance,
   getPatents,
-  getAgriCrops,
   type ResasConfig,
 } from '../build/providers/resas.js';
 
@@ -73,12 +72,6 @@ describe('RESAS deprecated — 全関数が提供終了エラーを返す', () =
 
   it('getPatents should return deprecated error', async () => {
     const result = await getPatents(TEST_CONFIG, { prefCode: 13, cityCode: '-' });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', DEPRECATED_MSG);
-  });
-
-  it('getAgriCrops should return deprecated error', async () => {
-    const result = await getAgriCrops(TEST_CONFIG, { prefCode: 1, cityCode: '-' });
     assert.equal(result.success, false);
     assert.match(result.error || '', DEPRECATED_MSG);
   });

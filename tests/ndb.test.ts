@@ -35,7 +35,7 @@ describe('NDB OpenData Hub API', () => {
       assert.equal(url.origin, 'https://ndbopendata-hub.com');
       assert.equal(url.pathname, '/api/v1/inspection-stats');
       assert.equal(url.searchParams.get('item_name'), 'BMI');
-      assert.equal(url.searchParams.get('record_mode'), 'inspection');
+      assert.equal(url.searchParams.get('record_mode'), 'basic');
       return mockJsonResponse({ data: [], total: 0 });
     };
 
@@ -107,7 +107,7 @@ describe('NDB OpenData Hub API', () => {
       const url = new URL(String(input));
       assert.equal(url.pathname, '/api/v1/range-labels');
       assert.equal(url.searchParams.get('item_name'), 'BMI');
-      assert.equal(url.searchParams.get('record_mode'), 'inspection');
+      assert.equal(url.searchParams.get('record_mode'), 'basic');
       return mockJsonResponse({ ranges: [] });
     };
 

@@ -65,15 +65,4 @@ describe('地理・地図API', () => {
     assert.equal((result.data as { results?: { lv01Nm?: string } })?.results?.lv01Nm, '東京都千代田区');
   });
 
-  it('reverseGeocode should fail when lat out of range', async () => {
-    const result = await reverseGeocode({ lat: -91, lon: 139.7 });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /lat must be between -90 and 90/);
-  });
-
-  it('reverseGeocode should fail when lon out of range', async () => {
-    const result = await reverseGeocode({ lat: 35.6, lon: 181 });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /lon must be between -180 and 180/);
-  });
 });

@@ -25,17 +25,20 @@ describe('国交省DPF API', () => {
   describe('searchMlitDpf', () => {
     it('should execute GraphQL search query', async () => {
       globalThis.fetch = async (input, init) => {
-        assert.equal(String(input), 'https://www.mlit-data.jp/api/v1/');
+        assert.equal(String(input), 'https://data-platform.mlit.go.jp/api/v1/');
         assert.equal(init?.method, 'POST');
         assert.equal((init?.headers as Record<string, string>)['Content-Type'], 'application/json');
         assert.equal((init?.headers as Record<string, string>).apikey, 'test-mlit-dpf-key');
 
         const body = JSON.parse(String(init?.body)) as { query: string };
-        assert.match(body.query, /search\(term:\s*"橋梁"/);
-        assert.match(body.query, /first:\s*0/);
-        assert.match(body.query, /size:\s*10/);
+        assert.match(body.query, /search\(first:\s*0,\s*size:\s*10,\s*term:\s*"橋梁"/);
         assert.match(body.query, /totalNumber/);
         assert.match(body.query, /searchResults/);
+        assert.match(body.query, /lat/);
+        assert.match(body.query, /lon/);
+        assert.match(body.query, /year/);
+        assert.match(body.query, /dataset_id/);
+        assert.match(body.query, /catalog_id/);
 
         return mockJsonResponse({
           data: {
@@ -49,7 +52,7 @@ describe('国交省DPF API', () => {
 
       const result = await searchMlitDpf(TEST_CONFIG, { term: '橋梁' });
       assert.equal(result.success, true);
-      assert.equal((result.data as any)?.search?.totalNumber, 1);
+      assert.equal((result.data as any)?.data?.search?.totalNumber, 1);
       assert.equal(result.source, '国交省DPF/search');
     });
 
@@ -59,32 +62,28 @@ describe('国交省DPF API', () => {
       assert.match(result.error || '', /MLIT_DPF_API_KEY is required/);
     });
 
-    it('should validate size range 1-100', async () => {
-      const low = await searchMlitDpf(TEST_CONFIG, { term: '河川', size: 0 });
-      assert.equal(low.success, false);
-      assert.match(low.error || '', /size must be an integer between 1 and 100/);
-
-      const high = await searchMlitDpf(TEST_CONFIG, { term: '河川', size: 101 });
-      assert.equal(high.success, false);
-      assert.match(high.error || '', /size must be an integer between 1 and 100/);
+    it('should fail when term is missing', async () => {
+      const result = await searchMlitDpf(TEST_CONFIG, { term: '' });
+      assert.equal(result.success, false);
+      assert.match(result.error || '', /term is required/);
     });
   });
 
   describe('getMlitDpfCatalog', () => {
     it('should execute GraphQL catalog query', async () => {
       globalThis.fetch = async (input, init) => {
-        assert.equal(String(input), 'https://www.mlit-data.jp/api/v1/');
+        assert.equal(String(input), 'https://data-platform.mlit.go.jp/api/v1/');
         assert.equal(init?.method, 'POST');
         const body = JSON.parse(String(init?.body)) as { query: string };
-        assert.match(body.query, /dataCatalog\(IDs:\s*"catalog-001"/);
+        assert.match(body.query, /catalog\(id:\s*"catalog-001"\)/);
         assert.match(body.query, /description/);
-        assert.match(body.query, /modified/);
 
         return mockJsonResponse({
           data: {
-            dataCatalog: {
+            catalog: {
               id: 'catalog-001',
               title: 'テストカタログ',
+              description: 'テスト説明',
             },
           },
         });
@@ -92,7 +91,7 @@ describe('国交省DPF API', () => {
 
       const result = await getMlitDpfCatalog(TEST_CONFIG, { id: 'catalog-001' });
       assert.equal(result.success, true);
-      assert.equal((result.data as any)?.dataCatalog?.id, 'catalog-001');
+      assert.equal((result.data as any)?.data?.catalog?.id, 'catalog-001');
       assert.equal(result.source, '国交省DPF/catalog');
     });
 

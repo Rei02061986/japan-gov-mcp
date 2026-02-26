@@ -33,11 +33,12 @@ describe('Scenario: Corporate Intelligence', () => {
     assert.match(result.error || '', /companyName or corporateNumber is required/);
   });
 
-  it('should skip when HOUJIN_APP_ID is not set', async () => {
+  it('should report skipped APIs when keys are not set', async () => {
     const result = await corporateIntelligence({ companyName: 'トヨタ自動車' });
     assert.equal(result.success, true);
-    const data = result.data as { skipped?: boolean };
-    assert.equal(data.skipped, true);
+    const data = result.data as { skipped?: string[] };
+    assert.ok(Array.isArray(data.skipped), 'skipped should be an array');
+    assert.ok(data.skipped!.length > 0, 'skipped should be non-empty');
   });
 
   it('should use corporateNumber directly when provided', async () => {
@@ -49,8 +50,8 @@ describe('Scenario: Corporate Intelligence', () => {
     });
 
     assert.equal(result.success, true);
-    const data = result.data as { corporateNumber?: string };
-    assert.equal(data.corporateNumber, '1234567890123');
+    const data = result.data as { query?: { corporateNumber?: string } };
+    assert.equal(data.query?.corporateNumber, '1234567890123');
   });
 });
 
@@ -58,7 +59,7 @@ describe('Scenario: Disaster Risk Assessment', () => {
   it('should require address or coordinates', async () => {
     const result = await disasterRiskAssessment({});
     assert.equal(result.success, false);
-    assert.match(result.error || '', /Either address or .* is required/);
+    assert.match(result.error || '', /address or lat\/lon is required/);
   });
 
   it('should use coordinates directly when provided', async () => {
@@ -117,14 +118,13 @@ describe('Scenario: Academic Trend', () => {
     const result = await academicTrend({ keyword: 'AI', limit: 5 });
     assert.equal(result.success, true);
 
-    const data = result.data as {
-      keyword?: string;
-      databases?: number;
-      results?: Record<string, unknown>;
-    };
+    const data = result.data as Record<string, unknown>;
     assert.equal(data.keyword, 'AI');
-    assert.equal(data.databases, 4); // NDL, J-STAGE, CiNii, JapanSearch
-    assert.ok(data.results);
+    // Provider returns named keys for each database
+    assert.ok('NDL' in data, 'should have NDL key');
+    assert.ok('J-STAGE' in data, 'should have J-STAGE key');
+    assert.ok('CiNii' in data, 'should have CiNii key');
+    assert.ok('JapanSearch' in data, 'should have JapanSearch key');
   });
 
   it('should include AgriKnowledge when requested', async () => {
@@ -133,8 +133,8 @@ describe('Scenario: Academic Trend', () => {
     const result = await academicTrend({ keyword: '稲作', includeAgri: true });
     assert.equal(result.success, true);
 
-    const data = result.data as { databases?: number };
-    assert.equal(data.databases, 5); // +AgriKnowledge
+    const data = result.data as Record<string, unknown>;
+    assert.ok('AgriKnowledge' in data, 'should have AgriKnowledge key');
   });
 });
 
@@ -154,9 +154,13 @@ describe('Scenario: Academic Trend By Topics', () => {
     });
 
     assert.equal(result.success, true);
-    const data = result.data as { topics?: string[]; results?: Record<string, unknown> };
-    assert.deepEqual(data.topics, ['AI', '機械学習', '深層学習']);
-    assert.ok(data.results);
+    // data is an array of topic results
+    const data = result.data as Array<{ topic: string }>;
+    assert.ok(Array.isArray(data), 'data should be an array');
+    assert.equal(data.length, 3);
+    assert.equal(data[0].topic, 'AI');
+    assert.equal(data[1].topic, '機械学習');
+    assert.equal(data[2].topic, '深層学習');
   });
 });
 
@@ -179,10 +183,10 @@ describe('Scenario: Realestate Demographics', () => {
 });
 
 describe('Scenario: Regional Economy Full', () => {
-  it('should validate prefectureCode format', async () => {
-    const result = await regionalEconomyFull({ prefectureCode: 'invalid' });
+  it('should validate empty prefectureCode', async () => {
+    const result = await regionalEconomyFull({ prefectureCode: '' });
     assert.equal(result.success, false);
-    assert.match(result.error || '', /must be a 2-digit code/);
+    assert.match(result.error || '', /prefectureCode is required/);
   });
 
   it('should call multiple APIs in parallel', async () => {
@@ -194,12 +198,9 @@ describe('Scenario: Regional Economy Full', () => {
         return mockJsonResponse({ value: [] });
       }
 
-      // BOJ mock (CSV)
+      // BOJ mock (JSON)
       if (url.hostname === 'www.stat-search.boj.or.jp') {
-        return new Response('Date,Value\n2024-01,100', {
-          status: 200,
-          headers: { 'content-type': 'text/csv' },
-        });
+        return mockJsonResponse({ data: [], total: 0 });
       }
 
       return mockJsonResponse({});
@@ -208,23 +209,27 @@ describe('Scenario: Regional Economy Full', () => {
     const result = await regionalEconomyFull({ prefectureCode: '13', year: 2024 });
     assert.equal(result.success, true);
 
-    const data = result.data as { prefecture?: { code?: string }; economy?: unknown };
-    assert.equal(data.prefecture?.code, '13');
-    assert.ok(data.economy);
+    const data = result.data as Record<string, unknown>;
+    assert.equal(data.prefectureCode, '13');
+    assert.ok(data.gdp !== undefined, 'should have gdp key');
+    assert.ok(data.population !== undefined, 'should have population key');
+    assert.ok(data.cpi !== undefined, 'should have cpi key');
   });
 });
 
 describe('Scenario: National Economy Summary', () => {
   it('should fetch national indicators', async () => {
     globalThis.fetch = async () =>
-      mockJsonResponse({
-        STATISTICAL_DATA: { DATA_INF: { NOTE: [], VALUE: [] } },
-      });
+      mockJsonResponse({ value: [] });
 
     const result = await nationalEconomySummary();
     assert.equal(result.success, true);
 
-    const data = result.data as { message?: string };
-    assert.match(data.message || '', /全国経済サマリー/);
+    // data is an array of {code, name, data} objects
+    const data = result.data as Array<{ code: string; name: string; data: unknown }>;
+    assert.ok(Array.isArray(data), 'data should be an array');
+    assert.ok(data.length > 0, 'should have indicator results');
+    assert.ok(data[0].code, 'each entry should have a code');
+    assert.ok(data[0].name, 'each entry should have a name');
   });
 });

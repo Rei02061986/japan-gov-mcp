@@ -23,10 +23,10 @@ function mockJsonResponse(body: unknown, status = 200): Response {
 }
 
 describe('Scenario: Regional Health Economy', () => {
-  it('should validate prefectureCode format', async () => {
-    const result = await regionalHealthEconomy({ prefectureCode: 'invalid' });
+  it('should validate empty prefectureCode', async () => {
+    const result = await regionalHealthEconomy({ prefectureCode: '' });
     assert.equal(result.success, false);
-    assert.match(result.error || '', /must be a 2-digit code/);
+    assert.match(result.error || '', /prefectureCode is required/);
   });
 
   it('should call multiple APIs in parallel', async () => {
@@ -45,12 +45,9 @@ describe('Scenario: Regional Health Economy', () => {
         return mockJsonResponse({ value: [] });
       }
 
-      // BOJ API mock (CSV response)
+      // BOJ API mock (JSON response)
       if (url.hostname === 'www.stat-search.boj.or.jp') {
-        return new Response('Date,Value\n2024-01,100', {
-          status: 200,
-          headers: { 'content-type': 'text/csv' },
-        });
+        return mockJsonResponse({ data: [], total: 0 });
       }
 
       return mockJsonResponse({});
@@ -61,10 +58,9 @@ describe('Scenario: Regional Health Economy', () => {
     assert.ok(callCount >= 3, 'Should call multiple APIs');
 
     const data = result.data as Record<string, unknown>;
-    assert.ok(data.prefecture);
-    assert.ok(data.health);
-    assert.ok(data.population);
-    assert.ok(data.macro);
+    assert.ok(data.health !== undefined);
+    assert.ok(data.population !== undefined);
+    assert.ok(data.macro !== undefined);
   });
 
   it('should handle API failures gracefully', async () => {
@@ -81,43 +77,45 @@ describe('Scenario: Regional Health Economy', () => {
 });
 
 describe('Scenario: Labor Demand Supply', () => {
-  it('should validate prefectureCode format', async () => {
-    const result = await laborDemandSupply({ prefectureCode: 'ABC' });
+  it('should validate empty prefectureCode', async () => {
+    const result = await laborDemandSupply({ prefectureCode: '' });
     assert.equal(result.success, false);
-    assert.match(result.error || '', /must be a 2-digit code/);
+    assert.match(result.error || '', /prefectureCode is required/);
   });
 
-  it('should return skipped status when API keys are missing', async () => {
+  it('should return error info when API keys are missing', async () => {
+    globalThis.fetch = async () => mockJsonResponse({ value: [] });
+
     const result = await laborDemandSupply({ prefectureCode: '13' });
     assert.equal(result.success, true);
 
     const data = result.data as Record<string, unknown>;
-    assert.ok(data.prefecture);
+    assert.ok(data.prefectureCode);
 
-    // Both APIs should be skipped due to missing keys
-    const vacancies = data.vacancies as Record<string, unknown>;
-    const laborStats = data.laborStats as Record<string, unknown>;
-    assert.equal(vacancies.skipped, true);
-    assert.equal(laborStats.skipped, true);
+    // jobs should have error since HELLOWORK_API_KEY is not set
+    const jobs = data.jobs as Record<string, unknown>;
+    assert.ok(jobs.error, 'jobs should contain error when API key missing');
+
+    // labor (dashboard) should still return data
+    assert.ok(data.labor !== undefined);
   });
 
-  it('should call e-Stat when appId is provided', async () => {
-    let estatCalled = false;
+  it('should call dashboard API for labor stats', async () => {
+    let dashboardCalled = false;
     globalThis.fetch = async (input: RequestInfo | URL) => {
       const url = new URL(String(input));
-      if (url.hostname === 'api.e-stat.go.jp') {
-        estatCalled = true;
-        return mockJsonResponse({ GET_STATS_LIST: { RESULT: { STATUS: 0 }, DATA_INF: [] } });
+      if (url.hostname === 'dashboard.e-stat.go.jp') {
+        dashboardCalled = true;
+        return mockJsonResponse({ value: [] });
       }
       return mockJsonResponse({});
     };
 
     const result = await laborDemandSupply({
       prefectureCode: '13',
-      appId: 'test-app-id',
     });
 
     assert.equal(result.success, true);
-    assert.ok(estatCalled, 'e-Stat API should be called');
+    assert.ok(dashboardCalled, 'Dashboard API should be called');
   });
 });

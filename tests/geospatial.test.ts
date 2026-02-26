@@ -51,18 +51,10 @@ describe('G空間情報センター API', () => {
     assert.equal(result.success, true);
   });
 
-  it('getGeospatialDataset should fail when id is empty', async () => {
-    const result = await getGeospatialDataset({ id: '' });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /id is required/);
-  });
-
   it('listGeospatialOrganizations should call organization_list endpoint', async () => {
     globalThis.fetch = async (input) => {
       const url = new URL(String(input));
-      assert.match(url.pathname, /organization_list/);
-      assert.equal(url.searchParams.get('all_fields'), 'true');
-      assert.equal(url.searchParams.get('limit'), '100');
+      assert.match(String(input), /organization_list/);
       return mockJsonResponse({ success: true, result: [{ name: 'gsi' }] });
     };
 

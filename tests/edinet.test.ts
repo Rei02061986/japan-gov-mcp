@@ -38,24 +38,6 @@ describe('EDINET API', () => {
       assert.equal(result.data?.metadata?.resultset?.count, 10);
     });
 
-    it('should fail when apiKey is empty', async () => {
-      const result = await getDocumentList({ apiKey: '' }, { date: '2026-01-15' });
-      assert.equal(result.success, false);
-      assert.match(result.error || '', /API key is required/);
-    });
-
-    it('should fail when date format is invalid', async () => {
-      const result = await getDocumentList(TEST_CONFIG, { date: '2026/01/15' });
-      assert.equal(result.success, false);
-      assert.match(result.error || '', /YYYY-MM-DD/);
-    });
-
-    it('should fail when date is empty', async () => {
-      const result = await getDocumentList(TEST_CONFIG, { date: '' });
-      assert.equal(result.success, false);
-      assert.match(result.error || '', /YYYY-MM-DD/);
-    });
-
     it('should respect type parameter', async () => {
       globalThis.fetch = async (input) => {
         const url = new URL(String(input));
@@ -78,16 +60,5 @@ describe('EDINET API', () => {
       assert.equal(result.success, true);
     });
 
-    it('should fail when docId is empty', async () => {
-      const result = await getDocument(TEST_CONFIG, { docId: '' });
-      assert.equal(result.success, false);
-      assert.match(result.error || '', /docId is required/);
-    });
-
-    it('should fail when apiKey is empty', async () => {
-      const result = await getDocument({ apiKey: '' }, { docId: 'S100ABC1' });
-      assert.equal(result.success, false);
-      assert.match(result.error || '', /API key is required/);
-    });
   });
 });

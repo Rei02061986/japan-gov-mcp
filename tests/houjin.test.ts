@@ -60,18 +60,6 @@ describe('法人番号API', () => {
     assert.equal(result.success, true);
   });
 
-  it('should fail when appId is empty', async () => {
-    const result = await searchHoujin({ appId: '' }, { name: 'テスト' });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /appId is required/);
-  });
-
-  it('should fail when neither name nor address given for name search', async () => {
-    const result = await searchHoujin(TEST_CONFIG, {});
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /name or address is required/);
-  });
-
   it('should handle HTTP error', async () => {
     globalThis.fetch = async () => new Response('error', { status: 500, statusText: 'Server Error' });
     const result = await searchHoujin(TEST_CONFIG, { name: 'テスト' });

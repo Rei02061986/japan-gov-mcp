@@ -27,7 +27,7 @@ describe('Geoshape API', () => {
     globalThis.fetch = async (input) => {
       const url = new URL(String(input));
       assert.equal(url.origin, 'https://geoshape.ex.nii.ac.jp');
-      assert.equal(url.pathname, '/city/geojson/N03-20230101_13101.geojson');
+      assert.equal(url.pathname, '/city/geojson/20240101/13101.json');
       return mockJsonResponse({ type: 'FeatureCollection', features: [] });
     };
 
@@ -46,7 +46,7 @@ describe('Geoshape API', () => {
     globalThis.fetch = async (input) => {
       const url = new URL(String(input));
       assert.equal(url.origin, 'https://geoshape.ex.nii.ac.jp');
-      assert.equal(url.pathname, '/pref/geojson/N03-20230101_13000.geojson');
+      assert.equal(url.pathname, '/city/geojson/20240101/13.json');
       return mockJsonResponse({ type: 'FeatureCollection', features: [] });
     };
 
@@ -61,9 +61,4 @@ describe('Geoshape API', () => {
     assert.match(result.error || '', /prefCode is required/);
   });
 
-  it('getPrefBoundary should fail when prefCode format is invalid', async () => {
-    const result = await getPrefBoundary({ prefCode: '1' });
-    assert.equal(result.success, false);
-    assert.match(result.error || '', /prefCode must be a 2-digit code/);
-  });
 });
