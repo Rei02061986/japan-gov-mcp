@@ -301,7 +301,7 @@ const tests = [
   { id: 234, name: 'EDGE: EDINET 過去の日付', tool: 'corporate', args: { action: 'edinet', date: '2020-01-01' } },
   { id: 235, name: 'EDGE: EDINET 未来の日付', tool: 'corporate', args: { action: 'edinet', date: '2030-12-31' } },
   { id: 236, name: 'EDGE: ジオコード 曖昧住所', tool: 'geo', args: { action: 'geocode', address: '東京' } },
-  { id: 237, name: 'EDGE: ジオコード 英語住所', tool: 'geo', args: { action: 'geocode', address: 'Tokyo Station' }, expectError: true },
+  { id: 237, name: 'EDGE: ジオコード 英語住所', tool: 'geo', args: { action: 'geocode', address: 'Tokyo Station' } },
   { id: 238, name: 'EDGE: 海外安全 無効国コード', tool: 'misc', args: { api: 'safety', country: '999' } },
   { id: 239, name: 'EDGE: 国会 超長期間', tool: 'law', args: { action: 'meeting', q: '憲法改正', from: '1947-01-01', until: '2026-02-28' } },
   { id: 240, name: 'EDGE: gBiz 特殊文字企業名', tool: 'corporate', args: { action: 'gbiz', name: '（株）テスト＆カンパニー' }, expectError: true },
