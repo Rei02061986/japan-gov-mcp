@@ -222,7 +222,7 @@ export async function fetchJson<T = any>(
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), options.timeout || 30000);
+  const timeoutId = setTimeout(() => controller.abort(), options.timeout || 40000);
 
   try {
     const res = await fetchWithRateLimit(url, {
@@ -273,7 +273,7 @@ export async function fetchXml(
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), options.timeout || 30000);
+  const timeoutId = setTimeout(() => controller.abort(), options.timeout || 40000);
 
   try {
     const res = await fetchWithRateLimit(url, {

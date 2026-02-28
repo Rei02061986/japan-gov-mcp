@@ -128,6 +128,10 @@ function detectEStatApiError(data: unknown): string | undefined {
   }
   if (status !== 0) {
     const msg = envelope?.RESULT?.ERROR_MSG?.trim() || 'e-Stat API returned an error';
+    // STATUS=1: 該当データなし → より短いキーワードを提案
+    if (status === 1) {
+      return `該当データなし。キーワードを短くしてください(例: "鉱工業生産指数"→"鉱工業")`;
+    }
     return `${msg} (STATUS=${status})`;
   }
   return undefined;
@@ -172,7 +176,7 @@ async function requestEStat<T>(
     appId: config.appId,
     ...params,
   });
-  const response = await fetchJson<T>(url, { source });
+  const response = await fetchJson<T>(url, { source, timeout: 50000 }); // e-Statは応答が遅い
   if (!response.success) {
     return response;
   }

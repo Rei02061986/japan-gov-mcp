@@ -42,7 +42,7 @@ export async function getAirQuality(params: {
   return fetchJson(url, {
     source: 'そらまめくん/air_quality',
     cacheTtl: CacheTTL.SEARCH,
-    timeout: 30000, // slow API
+    timeout: 45000, // slow API (応答10-20秒, ピーク時30秒超)
   });
 }
 
