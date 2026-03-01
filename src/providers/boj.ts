@@ -21,17 +21,33 @@ export async function getTimeSeriesData(params: {
   if (!params.seriesCode?.trim()) {
     return createError('日銀/timeseries', 'seriesCode is required');
   }
+  const freq = params.freq || 'M';
   const now = new Date();
-  const currentYM = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
-  const lastYearYM = `${now.getFullYear() - 1}01`;
+  const y = now.getFullYear();
+  const m = now.getMonth() + 1;
+
+  // 四半期データは開始月(01,04,07,10)のみ受付
+  let endDate = params.endDate;
+  let startDate = params.startDate;
+  if (!endDate) {
+    if (freq === 'Q') {
+      const qm = [1, 4, 7, 10].reverse().find(q => q <= m) || 1;
+      endDate = `${y}${String(qm).padStart(2, '0')}`;
+    } else {
+      endDate = `${y}${String(m).padStart(2, '0')}`;
+    }
+  }
+  if (!startDate) {
+    startDate = `${y - 1}01`;
+  }
 
   const url = buildUrl(`${BASE_URL}/getDataCode`, {
     format: params.format || 'json',
     lang: 'JP',
     db: params.db,
-    freq: params.freq || 'M',
-    startDate: params.startDate || lastYearYM,
-    endDate: params.endDate || currentYM,
+    freq,
+    startDate,
+    endDate,
     code: params.seriesCode,
   });
   return fetchJson(url, {
@@ -59,11 +75,11 @@ export async function getMetadata(params?: {
 export async function getMajorStatistics(): Promise<ApiResponse> {
   const majorCodes = {
     call_rate: { code: 'STRDCLUCON', db: 'FM01', freq: 'D', description: 'コールレート（無担保O/N）' },
-    tankan_di: { code: 'TK99F0000601GCQ00000', db: 'CO', freq: 'Q', description: '短観DI（全産業）' },
-    monetary_base: { code: "MD01'MBASE1", db: 'MD', freq: 'M', description: 'マネタリーベース' },
-    m2: { code: "MD02'MAAMAG", db: 'MD', freq: 'M', description: 'M2（マネーストック）' },
-    cpi_all: { code: "PR01'PRCPI01", db: 'PR', freq: 'M', description: '消費者物価指数（総合）' },
-    corporate_goods_price: { code: "PR02'PRCGPI01", db: 'PR', freq: 'M', description: '企業物価指数（総平均）' },
+    tankan_di: { code: 'TK99F0000601GCQ00000', db: 'CO', freq: 'Q', description: '短観DI（全産業）※日付はYYYYMM(01,04,07,10)' },
+    monetary_base: { code: 'MABS1AN11', db: 'MD01', freq: 'M', description: 'マネタリーベース平均残高' },
+    m2: { code: 'MAM1NAM2M2MO', db: 'MD02', freq: 'M', description: 'M2マネーストック' },
+    corporate_goods_price: { code: 'PRCG20_2200000000', db: 'PR01', freq: 'M', description: '国内企業物価指数（総平均）' },
+    services_price: { code: 'PRCS20_5200000000', db: 'PR02', freq: 'M', description: 'サービス価格指数（総平均）' },
   };
 
   return {

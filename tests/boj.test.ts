@@ -206,8 +206,8 @@ describe('BOJ getMajorStatistics', () => {
       'tankan_di',
       'monetary_base',
       'm2',
-      'cpi_all',
       'corporate_goods_price',
+      'services_price',
     ];
 
     for (const key of expectedKeys) {
@@ -231,7 +231,7 @@ describe('BOJ getMajorStatistics', () => {
     const result = await getMajorStatistics();
     const data = result.data as Record<string, { code: string; db: string }>;
     assert.ok(data.monetary_base);
-    assert.equal(data.monetary_base.db, 'MD');
+    assert.equal(data.monetary_base.db, 'MD01');
   });
 
   it('should include call rate and tankan series', async () => {

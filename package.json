@@ -7,10 +7,12 @@
     "japan-gov-mcp": "./build/index.js"
   },
   "scripts": {
-    "build": "tsc && chmod 755 build/index.js",
+    "build": "tsc && rm -rf build/data && cp -r src/data build/data 2>/dev/null; chmod 755 build/index.js",
     "start": "node build/index.js",
     "typecheck": "tsc --noEmit",
-    "test": "node --test 'tests/**/*.test.ts'",
+    "test": "node --test 'tests/*.test.ts'",
+    "test:e2e": "node --test 'tests/e2e/**/*.test.ts'",
+    "test:all": "node --test 'tests/**/*.test.ts'",
     "inspect": "npx @modelcontextprotocol/inspector node build/index.js",
     "prepublishOnly": "npm run build && npm test"
   },

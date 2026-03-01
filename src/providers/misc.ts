@@ -112,13 +112,11 @@ export async function getDashboardData(params: {
   if (!params.indicatorCode?.trim()) {
     return createError('統計ダッシュボード/statsData', 'indicatorCode is required');
   }
-  // NOTE: MetaGetFlg パラメータを含めるとWAF/CDNが404を返すため除外
+  // NOTE: TimeCdFrom/TimeCdTo/MetaGetFlg を含めるとWAF/CDNが404を返すため除外
   const url = buildUrl(`${DASHBOARD_BASE}/Json/getData`, {
     Lang: params.lang || 'JP',
     IndicatorCode: params.indicatorCode,
     RegionCode: params.regionCode,
-    TimeCdFrom: params.timeCdFrom,
-    TimeCdTo: params.timeCdTo,
   });
   return fetchJson<DashboardResponse>(url, {
     source: '統計ダッシュボード/statsData',
