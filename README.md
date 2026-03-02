@@ -183,6 +183,16 @@ npm test            # Run tests
 npm run inspect     # MCP Inspector GUI
 ```
 
+## Disclaimer
+
+- This project is **not affiliated with or endorsed by** the Japanese government or any of its agencies.
+- All data is retrieved from publicly available government APIs. **Accuracy, completeness, and availability are not guaranteed.**
+- Government APIs may change, rate-limit, or discontinue without notice.
+- This software is provided "as is" — see [LICENSE](./LICENSE) for details.
+- **Do not use government statistics as the sole basis for critical decisions** without verifying against official sources.
+
+> 本プロジェクトは日本政府・各省庁とは無関係の非公式ツールです。取得データの正確性・完全性・可用性は保証しません。政府APIは予告なく変更・停止される場合があります。重要な意思決定には必ず公式情報源を確認してください。
+
 ## License
 
 MIT
