@@ -25,11 +25,11 @@
   "author": "Agentic Governance",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/agentic-governance/japan-gov-mcp.git"
+    "url": "git+https://github.com/Rei02061986/japan-gov-mcp.git"
   },
-  "homepage": "https://github.com/agentic-governance/japan-gov-mcp#readme",
+  "homepage": "https://github.com/Rei02061986/japan-gov-mcp#readme",
   "bugs": {
-    "url": "https://github.com/agentic-governance/japan-gov-mcp/issues"
+    "url": "https://github.com/Rei02061986/japan-gov-mcp/issues"
   },
   "engines": {
     "node": ">=22"

@@ -1,0 +1,50 @@
+# smithery.yaml
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      estatAppId:
+        type: string
+        title: e-Stat API Key
+        description: "API key for e-Stat (https://www.e-stat.go.jp/api/)"
+      houjinAppId:
+        type: string
+        title: Corporate Number API Key
+        description: "API key for Houjin Bangou API"
+      gbizToken:
+        type: string
+        title: gBizINFO Token
+        description: "Token for gBizINFO API"
+      edinetApiKey:
+        type: string
+        title: EDINET API Key
+        description: "API key for EDINET financial filings"
+      mlitDpfApiKey:
+        type: string
+        title: MLIT Data Platform API Key
+        description: "API key for MLIT Data Platform"
+      realestateApiKey:
+        type: string
+        title: Real Estate API Key
+        description: "API key for Real Estate Information Library"
+      helloworkApiKey:
+        type: string
+        title: HelloWork API Key
+        description: "API key for HelloWork job listings"
+    required: []
+  commandFunction:
+    |-
+    (config) => ({
+      command: 'node',
+      args: ['build/index.js'],
+      env: {
+        ESTAT_APP_ID: config.estatAppId || '',
+        HOUJIN_APP_ID: config.houjinAppId || '',
+        GBIZ_TOKEN: config.gbizToken || '',
+        EDINET_API_KEY: config.edinetApiKey || '',
+        MLIT_DPF_API_KEY: config.mlitDpfApiKey || '',
+        REALESTATE_API_KEY: config.realestateApiKey || '',
+        HELLOWORK_API_KEY: config.helloworkApiKey || ''
+      }
+    })

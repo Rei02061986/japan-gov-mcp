@@ -20,7 +20,7 @@ Japanese government API integration for [MCP (Model Context Protocol)](https://m
 ### Install
 
 ```bash
-git clone https://github.com/agentic-governance/japan-gov-mcp.git
+git clone https://github.com/Rei02061986/japan-gov-mcp.git
 cd japan-gov-mcp
 npm install
 npm run build
