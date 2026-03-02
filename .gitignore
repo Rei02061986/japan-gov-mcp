@@ -1,7 +1,38 @@
+# Dependencies
 node_modules/
+
+# Build output
 build/
-.env
+dist/
 *.js.map
-.DS_Store
+
+# Environment (contains real API keys)
+.env
+.env.local
+.env.*.local
+
+# Logs
 logs/
 *.ndjson
+.japan-gov-mcp/
+
+# Source data with personal information
+scripts/data/edinetcode.csv
+scripts/data/cities-source.json
+scripts/data/wards-source.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test coverage
+coverage/
+
+# Temporary test scripts
+test-*.mjs

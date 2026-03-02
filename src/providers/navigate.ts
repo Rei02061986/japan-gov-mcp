@@ -83,7 +83,7 @@ export function recommend(params: {
 }): ApiResponse {
   const source = 'navigate/recommend';
   if (!params.topic?.trim()) {
-    return createError(source, 'topic is required');
+    return createError(source, 'トピック(topic)が必要です');
   }
 
   const resolved = resolveTopic(params.topic);
@@ -158,7 +158,7 @@ export async function schema(
 ): Promise<ApiResponse> {
   const source = 'navigate/schema';
   if (!params.id?.trim()) {
-    return createError(source, 'id is required');
+    return createError(source, 'データID(id)が必要です');
   }
 
   if (params.source === 'estat') {
@@ -241,7 +241,7 @@ export function coverage(params: {
 }): ApiResponse {
   const source = 'navigate/coverage';
   if (!params.topic && !params.area) {
-    return createError(source, 'topic or area (or both) is required');
+    return createError(source, 'トピック(topic)または地域(area)のいずれかが必要です');
   }
 
   const apis: Array<Record<string, unknown>> = [];

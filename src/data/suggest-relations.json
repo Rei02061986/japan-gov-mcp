@@ -1,0 +1,255 @@
+{
+  "relations": [
+    {
+      "indicator": "出生率",
+      "related": [
+        { "label": "婚姻率", "source": "estat", "strength": "strong", "query": "婚姻 人口動態" },
+        { "label": "女性就業率", "source": "estat", "strength": "moderate", "query": "女性 就業率" },
+        { "label": "待機児童数", "source": "estat", "strength": "moderate", "query": "待機児童" },
+        { "label": "平均年収", "source": "estat", "strength": "moderate", "query": "賃金構造 年収" },
+        { "label": "住宅価格", "source": "misc", "strength": "moderate" }
+      ]
+    },
+    {
+      "indicator": "人口",
+      "related": [
+        { "label": "出生率", "source": "estat", "strength": "strong", "query": "出生 人口動態" },
+        { "label": "高齢化率", "source": "estat", "strength": "strong", "query": "高齢者 人口" },
+        { "label": "社会増減", "source": "estat", "strength": "strong", "query": "人口移動" },
+        { "label": "雇用", "source": "estat", "strength": "moderate", "query": "労働力調査" }
+      ]
+    },
+    {
+      "indicator": "GDP",
+      "related": [
+        { "label": "鉱工業生産", "source": "stats", "strength": "strong", "query": "鉱工業生産" },
+        { "label": "消費支出", "source": "stats", "strength": "strong", "query": "家計消費支出" },
+        { "label": "輸出額", "source": "stats", "strength": "moderate", "query": "輸出" },
+        { "label": "設備投資", "source": "estat", "strength": "moderate", "query": "設備投資" }
+      ]
+    },
+    {
+      "indicator": "物価",
+      "related": [
+        { "label": "賃金", "source": "estat", "strength": "strong", "query": "毎月勤労統計" },
+        { "label": "金利", "source": "boj", "strength": "strong" },
+        { "label": "為替レート", "source": "boj", "strength": "moderate" },
+        { "label": "消費支出", "source": "stats", "strength": "moderate", "query": "家計消費支出" }
+      ]
+    },
+    {
+      "indicator": "雇用",
+      "related": [
+        { "label": "賃金", "source": "estat", "strength": "strong", "query": "毎月勤労統計" },
+        { "label": "GDP", "source": "stats", "strength": "strong" },
+        { "label": "鉱工業生産", "source": "stats", "strength": "moderate", "query": "鉱工業生産" },
+        { "label": "人口", "source": "estat", "strength": "moderate", "query": "人口推計" }
+      ]
+    },
+    {
+      "indicator": "失業率",
+      "related": [
+        { "label": "有効求人倍率", "source": "estat", "strength": "strong", "query": "有効求人倍率" },
+        { "label": "GDP", "source": "stats", "strength": "strong" },
+        { "label": "賃金", "source": "estat", "strength": "moderate", "query": "毎月勤労統計" }
+      ]
+    },
+    {
+      "indicator": "賃金",
+      "related": [
+        { "label": "物価", "source": "stats", "strength": "strong", "query": "消費者物価指数" },
+        { "label": "雇用", "source": "estat", "strength": "strong", "query": "労働力調査" },
+        { "label": "GDP", "source": "stats", "strength": "moderate" },
+        { "label": "生産性", "source": "estat", "strength": "moderate", "query": "労働生産性" }
+      ]
+    },
+    {
+      "indicator": "地価",
+      "related": [
+        { "label": "人口", "source": "estat", "strength": "strong", "query": "人口推計" },
+        { "label": "金利", "source": "boj", "strength": "strong" },
+        { "label": "住宅着工", "source": "estat", "strength": "moderate", "query": "住宅着工" },
+        { "label": "犯罪率", "source": "estat", "strength": "weak", "query": "犯罪統計" }
+      ]
+    },
+    {
+      "indicator": "住宅",
+      "related": [
+        { "label": "金利", "source": "boj", "strength": "strong" },
+        { "label": "人口", "source": "estat", "strength": "strong", "query": "人口推計" },
+        { "label": "地価", "source": "misc", "strength": "strong" },
+        { "label": "世帯数", "source": "estat", "strength": "moderate", "query": "住民基本台帳 世帯" }
+      ]
+    },
+    {
+      "indicator": "消費",
+      "related": [
+        { "label": "物価", "source": "stats", "strength": "strong", "query": "消費者物価指数" },
+        { "label": "賃金", "source": "estat", "strength": "strong", "query": "毎月勤労統計" },
+        { "label": "GDP", "source": "stats", "strength": "moderate" },
+        { "label": "消費者信頼感", "source": "estat", "strength": "moderate", "query": "消費者態度" }
+      ]
+    },
+    {
+      "indicator": "貿易",
+      "related": [
+        { "label": "為替レート", "source": "boj", "strength": "strong" },
+        { "label": "GDP", "source": "stats", "strength": "strong" },
+        { "label": "鉱工業生産", "source": "stats", "strength": "moderate", "query": "鉱工業生産" }
+      ]
+    },
+    {
+      "indicator": "金利",
+      "related": [
+        { "label": "物価", "source": "stats", "strength": "strong", "query": "消費者物価指数" },
+        { "label": "為替レート", "source": "boj", "strength": "strong" },
+        { "label": "住宅着工", "source": "estat", "strength": "moderate", "query": "住宅着工" },
+        { "label": "マネーストック", "source": "boj", "strength": "moderate" }
+      ]
+    },
+    {
+      "indicator": "金融",
+      "related": [
+        { "label": "金利", "source": "boj", "strength": "strong" },
+        { "label": "GDP", "source": "stats", "strength": "moderate" },
+        { "label": "物価", "source": "stats", "strength": "moderate", "query": "消費者物価指数" }
+      ]
+    },
+    {
+      "indicator": "鉱工業",
+      "related": [
+        { "label": "GDP", "source": "stats", "strength": "strong" },
+        { "label": "輸出額", "source": "stats", "strength": "moderate", "query": "輸出" },
+        { "label": "雇用", "source": "estat", "strength": "moderate", "query": "労働力調査" }
+      ]
+    },
+    {
+      "indicator": "観光",
+      "related": [
+        { "label": "為替レート", "source": "boj", "strength": "moderate" },
+        { "label": "GDP", "source": "stats", "strength": "moderate" },
+        { "label": "交通", "source": "estat", "strength": "moderate", "query": "交通 旅客" }
+      ]
+    },
+    {
+      "indicator": "教育",
+      "related": [
+        { "label": "人口", "source": "estat", "strength": "strong", "query": "人口推計" },
+        { "label": "出生率", "source": "estat", "strength": "strong", "query": "出生 人口動態" },
+        { "label": "財政", "source": "estat", "strength": "moderate", "query": "教育費" }
+      ]
+    },
+    {
+      "indicator": "医療",
+      "related": [
+        { "label": "高齢化率", "source": "estat", "strength": "strong", "query": "高齢者 人口" },
+        { "label": "人口", "source": "estat", "strength": "moderate", "query": "人口推計" },
+        { "label": "社会保障費", "source": "estat", "strength": "moderate", "query": "社会保障" }
+      ]
+    },
+    {
+      "indicator": "福祉",
+      "related": [
+        { "label": "高齢化率", "source": "estat", "strength": "strong", "query": "高齢者 人口" },
+        { "label": "医療", "source": "estat", "strength": "strong", "query": "医療施設" },
+        { "label": "財政", "source": "estat", "strength": "moderate", "query": "社会保障費" }
+      ]
+    },
+    {
+      "indicator": "高齢化",
+      "related": [
+        { "label": "人口", "source": "estat", "strength": "strong", "query": "人口推計" },
+        { "label": "介護費用", "source": "estat", "strength": "strong", "query": "介護保険" },
+        { "label": "医療費", "source": "estat", "strength": "strong", "query": "医療費" },
+        { "label": "年金", "source": "estat", "strength": "moderate", "query": "年金" }
+      ]
+    },
+    {
+      "indicator": "少子化",
+      "related": [
+        { "label": "出生率", "source": "estat", "strength": "strong", "query": "出生 人口動態" },
+        { "label": "婚姻率", "source": "estat", "strength": "strong", "query": "婚姻 人口動態" },
+        { "label": "待機児童数", "source": "estat", "strength": "moderate", "query": "待機児童" },
+        { "label": "女性就業率", "source": "estat", "strength": "moderate", "query": "女性 就業率" }
+      ]
+    },
+    {
+      "indicator": "農業",
+      "related": [
+        { "label": "人口", "source": "estat", "strength": "moderate", "query": "農業人口" },
+        { "label": "高齢化率", "source": "estat", "strength": "moderate", "query": "農業 高齢化" },
+        { "label": "食料自給率", "source": "estat", "strength": "strong", "query": "食料自給率" }
+      ]
+    },
+    {
+      "indicator": "環境",
+      "related": [
+        { "label": "エネルギー", "source": "estat", "strength": "strong", "query": "エネルギー消費" },
+        { "label": "鉱工業生産", "source": "stats", "strength": "moderate", "query": "鉱工業生産" },
+        { "label": "GDP", "source": "stats", "strength": "moderate" }
+      ]
+    },
+    {
+      "indicator": "エネルギー",
+      "related": [
+        { "label": "環境", "source": "estat", "strength": "strong", "query": "温室効果ガス" },
+        { "label": "鉱工業生産", "source": "stats", "strength": "moderate", "query": "鉱工業生産" },
+        { "label": "物価", "source": "stats", "strength": "moderate", "query": "消費者物価指数" }
+      ]
+    },
+    {
+      "indicator": "犯罪",
+      "related": [
+        { "label": "人口", "source": "estat", "strength": "moderate", "query": "人口推計" },
+        { "label": "雇用", "source": "estat", "strength": "moderate", "query": "労働力調査" },
+        { "label": "外国人", "source": "estat", "strength": "weak", "query": "在留外国人" }
+      ]
+    },
+    {
+      "indicator": "財政",
+      "related": [
+        { "label": "GDP", "source": "stats", "strength": "strong" },
+        { "label": "税収", "source": "estat", "strength": "strong", "query": "税収" },
+        { "label": "社会保障費", "source": "estat", "strength": "strong", "query": "社会保障" },
+        { "label": "国債", "source": "boj", "strength": "moderate" }
+      ]
+    },
+    {
+      "indicator": "交通",
+      "related": [
+        { "label": "人口", "source": "estat", "strength": "moderate", "query": "人口推計" },
+        { "label": "GDP", "source": "stats", "strength": "moderate" },
+        { "label": "環境", "source": "estat", "strength": "moderate", "query": "CO2 排出" }
+      ]
+    },
+    {
+      "indicator": "入札",
+      "related": [
+        { "label": "財政", "source": "estat", "strength": "strong", "query": "地方財政" },
+        { "label": "GDP", "source": "stats", "strength": "moderate" }
+      ]
+    },
+    {
+      "indicator": "中小企業",
+      "related": [
+        { "label": "雇用", "source": "estat", "strength": "strong", "query": "労働力調査" },
+        { "label": "GDP", "source": "stats", "strength": "moderate" },
+        { "label": "補助金", "source": "estat", "strength": "moderate", "query": "中小企業 補助金" }
+      ]
+    },
+    {
+      "indicator": "海外安全",
+      "related": [
+        { "label": "観光", "source": "estat", "strength": "moderate", "query": "訪日外国人" },
+        { "label": "貿易", "source": "estat", "strength": "moderate", "query": "貿易統計" }
+      ]
+    },
+    {
+      "indicator": "文化",
+      "related": [
+        { "label": "観光", "source": "estat", "strength": "moderate", "query": "宿泊旅行統計" },
+        { "label": "教育", "source": "estat", "strength": "moderate", "query": "社会教育調査" }
+      ]
+    }
+  ]
+}

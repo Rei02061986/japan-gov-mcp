@@ -80,9 +80,10 @@ async function getToolList(): Promise<{ name: string; description: string }[]> {
   });
 }
 
-// v3.1: 12 tools (9 original + 3 new: resolve, navigate, join)
+// v3.2: 13 tools (9 original + resolve, navigate, join, context)
 const EXPECTED_TOOLS = [
   'academic',
+  'context',
   'corporate',
   'estat',
   'geo',
@@ -97,7 +98,7 @@ const EXPECTED_TOOLS = [
 ];
 
 describe('MCP Server Smoke Test', () => {
-  it('should start and register all 12 tools', async () => {
+  it('should start and register all 13 tools', async () => {
     const tools = await getToolList();
     const toolNames = tools.map(t => t.name).sort();
 

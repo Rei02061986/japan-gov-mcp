@@ -1,0 +1,385 @@
+{
+  "topics": {
+    "人口": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "人口推計" }, "label": "人口推計（総務省）" },
+        { "tool": "stats", "action": "dash_data", "params": { "code": "A1101" }, "label": "人口総数（ダッシュボード）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "住民基本台帳 人口" }, "label": "住民基本台帳人口" },
+        { "tool": "estat", "action": "search", "params": { "q": "国勢調査 人口" }, "label": "国勢調査" }
+      ],
+      "estatField": "02",
+      "keywords": ["人口", "世帯", "人口動態", "出生", "死亡"]
+    },
+    "GDP": {
+      "primary": [
+        { "tool": "stats", "action": "dash_data", "params": { "code": "C3101" }, "label": "GDP実質成長率（ダッシュボード）" },
+        { "tool": "estat", "action": "search", "params": { "q": "県内総生産" }, "label": "県内総生産（e-Stat）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "国民経済計算" }, "label": "国民経済計算（SNA）" }
+      ],
+      "estatField": "03",
+      "keywords": ["GDP", "総生産", "経済成長", "SNA", "国民経済計算"]
+    },
+    "物価": {
+      "primary": [
+        { "tool": "stats", "action": "dash_data", "params": { "code": "E2101" }, "label": "消費者物価指数（ダッシュボード）" },
+        { "tool": "stats", "action": "boj_data", "params": { "code": "PR01'PRCPI01", "db": "PR01" }, "label": "CPI（日銀）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "消費者物価指数" }, "label": "消費者物価指数（e-Stat）" },
+        { "tool": "stats", "action": "boj_data", "params": { "code": "PR01'PRCEPI_A01", "db": "PR01" }, "label": "企業物価指数（日銀）" }
+      ],
+      "estatField": "03",
+      "keywords": ["物価", "CPI", "消費者物価", "企業物価", "インフレ"]
+    },
+    "雇用": {
+      "primary": [
+        { "tool": "stats", "action": "dash_data", "params": { "code": "D3101" }, "label": "完全失業率（ダッシュボード）" },
+        { "tool": "estat", "action": "search", "params": { "q": "労働力調査" }, "label": "労働力調査（e-Stat）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "有効求人倍率" }, "label": "有効求人倍率" },
+        { "tool": "misc", "action": "hellowork", "params": {}, "label": "ハローワーク求人" }
+      ],
+      "estatField": "04",
+      "keywords": ["雇用", "失業", "求人", "労働", "就業", "賃金"]
+    },
+    "貿易": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "貿易統計" }, "label": "貿易統計（e-Stat）" },
+        { "tool": "stats", "action": "dash_data", "params": { "code": "F1101" }, "label": "輸出額（ダッシュボード）" }
+      ],
+      "secondary": [
+        { "tool": "stats", "action": "dash_data", "params": { "code": "F1102" }, "label": "輸入額（ダッシュボード）" }
+      ],
+      "estatField": "03",
+      "keywords": ["貿易", "輸出", "輸入", "国際収支", "経常収支"]
+    },
+    "財政": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "地方財政" }, "label": "地方財政統計（e-Stat）" },
+        { "tool": "stats", "action": "dash_data", "params": { "code": "G1101" }, "label": "国債残高（ダッシュボード）" }
+      ],
+      "secondary": [],
+      "estatField": "05",
+      "keywords": ["財政", "税収", "歳入", "歳出", "国債", "地方債"]
+    },
+    "金融": {
+      "primary": [
+        { "tool": "stats", "action": "boj_codes", "params": {}, "label": "日銀統計コード一覧" },
+        { "tool": "stats", "action": "boj_data", "params": { "code": "FM01'FMSTCKTM", "db": "FM01" }, "label": "コールレート（日銀）" }
+      ],
+      "secondary": [
+        { "tool": "stats", "action": "boj_data", "params": { "db": "MD02" }, "label": "マネーストック（日銀）" }
+      ],
+      "estatField": "03",
+      "keywords": ["金融", "金利", "マネー", "為替", "株価", "短観"]
+    },
+    "鉱工業": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "鉱工業生産" }, "label": "鉱工業生産指数（e-Stat）" },
+        { "tool": "stats", "action": "dash_data", "params": { "code": "C1101" }, "label": "鉱工業生産（ダッシュボード）" }
+      ],
+      "secondary": [],
+      "estatField": "03",
+      "keywords": ["鉱工業", "生産指数", "製造業", "出荷", "在庫"]
+    },
+    "住宅": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "住宅着工" }, "label": "住宅着工統計（e-Stat）" },
+        { "tool": "misc", "action": "realestate", "params": {}, "label": "不動産取引価格" }
+      ],
+      "secondary": [
+        { "tool": "misc", "action": "landprice", "params": {}, "label": "公示地価" },
+        { "tool": "estat", "action": "search", "params": { "q": "住宅・土地統計" }, "label": "住宅・土地統計調査" }
+      ],
+      "estatField": "10",
+      "keywords": ["住宅", "不動産", "地価", "着工", "マンション"]
+    },
+    "教育": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "学校基本調査" }, "label": "学校基本調査（e-Stat）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "社会教育調査" }, "label": "社会教育調査" }
+      ],
+      "estatField": "11",
+      "keywords": ["教育", "学校", "児童", "生徒", "大学", "進学率"]
+    },
+    "医療": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "医療施設調査" }, "label": "医療施設調査（e-Stat）" },
+        { "tool": "stats", "action": "ndb_items", "params": {}, "label": "NDB検査項目一覧" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "患者調査" }, "label": "患者調査" },
+        { "tool": "stats", "action": "ndb_stats", "params": {}, "label": "NDB特定健診データ" }
+      ],
+      "estatField": "14",
+      "keywords": ["医療", "病院", "患者", "健診", "健康"]
+    },
+    "福祉": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "社会福祉施設" }, "label": "社会福祉施設調査（e-Stat）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "介護保険事業" }, "label": "介護保険事業状況報告" },
+        { "tool": "estat", "action": "search", "params": { "q": "生活保護" }, "label": "生活保護統計" }
+      ],
+      "estatField": "14",
+      "keywords": ["福祉", "介護", "生活保護", "障害", "年金", "社会保障"]
+    },
+    "少子化": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "出生 人口動態" }, "label": "出生数（人口動態統計）" },
+        { "tool": "stats", "action": "dash_data", "params": { "code": "A1301" }, "label": "出生率（ダッシュボード）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "婚姻 人口動態" }, "label": "婚姻数（人口動態統計）" },
+        { "tool": "estat", "action": "search", "params": { "q": "保育所" }, "label": "保育所等利用状況" }
+      ],
+      "estatField": "02",
+      "keywords": ["少子化", "出生率", "合計特殊出生率", "婚姻", "待機児童"]
+    },
+    "高齢化": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "高齢者 人口" }, "label": "高齢者人口（e-Stat）" },
+        { "tool": "stats", "action": "dash_data", "params": { "code": "A1501" }, "label": "高齢化率（ダッシュボード）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "介護保険" }, "label": "介護保険統計" }
+      ],
+      "estatField": "02",
+      "keywords": ["高齢化", "高齢者", "老年人口", "介護", "要介護"]
+    },
+    "観光": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "宿泊旅行統計" }, "label": "宿泊旅行統計（e-Stat）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "訪日外国人" }, "label": "訪日外国人統計" }
+      ],
+      "estatField": "16",
+      "keywords": ["観光", "宿泊", "旅行", "インバウンド", "訪日"]
+    },
+    "農業": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "農業 経営体" }, "label": "農林業センサス（e-Stat）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "作物統計" }, "label": "作物統計" },
+        { "tool": "academic", "action": "agriknowledge", "params": {}, "label": "農業文献（AgriKnowledge）" }
+      ],
+      "estatField": "06",
+      "keywords": ["農業", "農家", "耕地", "米", "食料自給率"]
+    },
+    "環境": {
+      "primary": [
+        { "tool": "academic", "action": "air", "params": {}, "label": "大気質（そらまめくん）" },
+        { "tool": "estat", "action": "search", "params": { "q": "環境統計" }, "label": "環境統計（e-Stat）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "温室効果ガス" }, "label": "温室効果ガス排出量" }
+      ],
+      "estatField": "15",
+      "keywords": ["環境", "大気", "PM2.5", "温暖化", "CO2", "廃棄物"]
+    },
+    "企業": {
+      "primary": [
+        { "tool": "corporate", "action": "gbiz", "params": {}, "label": "gBiz企業検索" },
+        { "tool": "corporate", "action": "houjin", "params": {}, "label": "法人番号検索" }
+      ],
+      "secondary": [
+        { "tool": "corporate", "action": "edinet", "params": {}, "label": "有価証券報告書（EDINET）" },
+        { "tool": "corporate", "action": "gbiz_detail", "params": {}, "label": "gBiz詳細（特許/調達/補助金等）" }
+      ],
+      "estatField": "07",
+      "keywords": ["企業", "法人", "会社", "特許", "調達", "補助金"]
+    },
+    "気象": {
+      "primary": [
+        { "tool": "weather", "action": "forecast", "params": {}, "label": "天気予報（気象庁）" },
+        { "tool": "weather", "action": "amedas", "params": {}, "label": "アメダス観測データ" }
+      ],
+      "secondary": [
+        { "tool": "weather", "action": "earthquake", "params": {}, "label": "地震情報" },
+        { "tool": "weather", "action": "typhoon", "params": {}, "label": "台風情報" }
+      ],
+      "estatField": "",
+      "keywords": ["天気", "気象", "気温", "降水", "台風", "地震"]
+    },
+    "防災": {
+      "primary": [
+        { "tool": "weather", "action": "hazard", "params": {}, "label": "地震ハザード（J-SHIS）" },
+        { "tool": "weather", "action": "flood", "params": {}, "label": "浸水深（浸水ナビ）" }
+      ],
+      "secondary": [
+        { "tool": "weather", "action": "earthquake", "params": {}, "label": "地震情報" },
+        { "tool": "weather", "action": "tsunami", "params": {}, "label": "津波情報" }
+      ],
+      "estatField": "",
+      "keywords": ["防災", "災害", "地震", "津波", "浸水", "ハザード"]
+    },
+    "交通": {
+      "primary": [
+        { "tool": "weather", "action": "traffic", "params": {}, "label": "交通量（JARTIC）" },
+        { "tool": "opendata", "action": "dpf", "params": { "q": "道路" }, "label": "道路データ（国交DPF）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "交通 自動車" }, "label": "交通統計（e-Stat）" }
+      ],
+      "estatField": "16",
+      "keywords": ["交通", "道路", "鉄道", "自動車", "物流"]
+    },
+    "法令": {
+      "primary": [
+        { "tool": "law", "action": "search", "params": {}, "label": "法令キーワード検索" },
+        { "tool": "law", "action": "speech", "params": {}, "label": "国会議事録（発言検索）" }
+      ],
+      "secondary": [
+        { "tool": "law", "action": "meeting", "params": {}, "label": "国会議事録（会議一覧）" },
+        { "tool": "law", "action": "pubcomment", "params": {}, "label": "パブリックコメント" }
+      ],
+      "estatField": "",
+      "keywords": ["法令", "法律", "国会", "議事録", "パブコメ"]
+    },
+    "地理": {
+      "primary": [
+        { "tool": "geo", "action": "geocode", "params": {}, "label": "住所→座標変換" },
+        { "tool": "geo", "action": "plateau", "params": {}, "label": "PLATEAU 3D都市モデル" }
+      ],
+      "secondary": [
+        { "tool": "geo", "action": "reverse", "params": {}, "label": "座標→住所変換" },
+        { "tool": "opendata", "action": "geo", "params": {}, "label": "G空間情報センター" }
+      ],
+      "estatField": "",
+      "keywords": ["地理", "地図", "GIS", "座標", "境界", "3D"]
+    },
+    "学術": {
+      "primary": [
+        { "tool": "academic", "action": "jstage", "params": {}, "label": "J-STAGE論文検索" },
+        { "tool": "academic", "action": "cinii", "params": {}, "label": "CiNii論文検索" }
+      ],
+      "secondary": [
+        { "tool": "academic", "action": "ndl", "params": {}, "label": "国会図書館書籍検索" },
+        { "tool": "academic", "action": "irdb", "params": {}, "label": "機関リポジトリ" }
+      ],
+      "estatField": "",
+      "keywords": ["論文", "学術", "研究", "文献", "書籍"]
+    },
+    "文化": {
+      "primary": [
+        { "tool": "academic", "action": "japansearch", "params": {}, "label": "ジャパンサーチ（文化財）" }
+      ],
+      "secondary": [
+        { "tool": "academic", "action": "ndl", "params": {}, "label": "国会図書館書籍検索" }
+      ],
+      "estatField": "",
+      "keywords": ["文化", "文化財", "美術", "博物館", "図書館"]
+    },
+    "海外安全": {
+      "primary": [
+        { "tool": "misc", "action": "safety", "params": {}, "label": "外務省海外安全情報" }
+      ],
+      "secondary": [],
+      "estatField": "",
+      "keywords": ["海外", "安全", "渡航", "危険", "治安"]
+    },
+    "入札": {
+      "primary": [
+        { "tool": "misc", "action": "kkj", "params": {}, "label": "官公需（政府入札）" }
+      ],
+      "secondary": [
+        { "tool": "corporate", "action": "gbiz_detail", "params": { "infoType": "procurement" }, "label": "gBiz調達情報" }
+      ],
+      "estatField": "",
+      "keywords": ["入札", "調達", "官公需", "公共事業"]
+    },
+    "中小企業": {
+      "primary": [
+        { "tool": "misc", "action": "mirasapo", "params": {}, "label": "ミラサポplus成功事例" },
+        { "tool": "estat", "action": "search", "params": { "q": "中小企業" }, "label": "中小企業統計（e-Stat）" }
+      ],
+      "secondary": [],
+      "estatField": "07",
+      "keywords": ["中小企業", "スタートアップ", "創業", "経営"]
+    },
+    "エネルギー": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "エネルギー消費" }, "label": "エネルギー統計（e-Stat）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "再生可能エネルギー" }, "label": "再エネ統計" }
+      ],
+      "estatField": "15",
+      "keywords": ["エネルギー", "電力", "再エネ", "原子力", "省エネ"]
+    },
+    "犯罪": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "犯罪統計" }, "label": "犯罪統計（e-Stat）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "刑法犯" }, "label": "刑法犯認知件数" }
+      ],
+      "estatField": "08",
+      "keywords": ["犯罪", "治安", "刑法", "検挙", "交通事故"]
+    },
+    "賃金": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "毎月勤労統計" }, "label": "毎月勤労統計（e-Stat）" },
+        { "tool": "stats", "action": "dash_data", "params": { "code": "D2101" }, "label": "現金給与総額（ダッシュボード）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "賃金構造" }, "label": "賃金構造基本統計" }
+      ],
+      "estatField": "04",
+      "keywords": ["賃金", "給与", "年収", "最低賃金", "報酬"]
+    },
+    "消費": {
+      "primary": [
+        { "tool": "estat", "action": "search", "params": { "q": "家計調査 消費" }, "label": "家計調査（e-Stat）" },
+        { "tool": "stats", "action": "dash_data", "params": { "code": "E1101" }, "label": "家計消費支出（ダッシュボード）" }
+      ],
+      "secondary": [
+        { "tool": "estat", "action": "search", "params": { "q": "小売業販売額" }, "label": "商業動態統計" }
+      ],
+      "estatField": "03",
+      "keywords": ["消費", "家計", "支出", "小売", "購買"]
+    }
+  },
+  "aliases": {
+    "population": "人口", "demographics": "人口", "人口動態": "人口",
+    "gdp": "GDP", "経済成長": "GDP", "国内総生産": "GDP", "growth": "GDP",
+    "cpi": "物価", "consumer price": "物価", "inflation": "物価", "デフレ": "物価", "インフレ": "物価",
+    "employment": "雇用", "unemployment": "雇用", "labor": "雇用", "失業": "雇用", "求人": "雇用",
+    "trade": "貿易", "export": "貿易", "import": "貿易", "輸出": "貿易", "輸入": "貿易",
+    "finance": "金融", "interest rate": "金融", "金利": "金融", "為替": "金融",
+    "housing": "住宅", "real estate": "住宅", "不動産": "住宅", "地価": "住宅",
+    "education": "教育", "school": "教育", "学校": "教育",
+    "health": "医療", "healthcare": "医療", "hospital": "医療", "病院": "医療", "NDB": "医療",
+    "welfare": "福祉", "social security": "福祉", "社会保障": "福祉", "介護": "福祉", "年金": "福祉",
+    "birthrate": "少子化", "fertility": "少子化", "出生率": "少子化", "子育て": "少子化", "待機児童": "少子化",
+    "aging": "高齢化", "elderly": "高齢化", "老人": "高齢化",
+    "tourism": "観光", "travel": "観光", "インバウンド": "観光",
+    "agriculture": "農業", "farming": "農業", "食料自給率": "農業",
+    "environment": "環境", "pollution": "環境", "climate": "環境", "温暖化": "環境", "PM2.5": "環境",
+    "company": "企業", "corporate": "企業", "法人": "企業", "特許": "企業",
+    "weather": "気象", "forecast": "気象", "天気": "気象",
+    "disaster": "防災", "earthquake": "防災", "地震": "防災", "津波": "防災",
+    "transport": "交通", "traffic": "交通", "road": "交通", "railroad": "交通",
+    "legislation": "法令", "law": "法令", "国会": "法令", "diet": "法令",
+    "geography": "地理", "map": "地理", "GIS": "地理", "PLATEAU": "地理",
+    "research": "学術", "paper": "学術", "academic": "学術",
+    "culture": "文化", "heritage": "文化", "museum": "文化",
+    "safety": "海外安全", "overseas": "海外安全",
+    "procurement": "入札", "tender": "入札", "bidding": "入札",
+    "sme": "中小企業", "startup": "中小企業",
+    "energy": "エネルギー", "electricity": "エネルギー", "再エネ": "エネルギー",
+    "crime": "犯罪", "security": "犯罪", "police": "犯罪",
+    "wage": "賃金", "salary": "賃金", "income": "賃金", "給料": "賃金",
+    "consumption": "消費", "spending": "消費", "retail": "消費", "家計": "消費"
+  }
+}

@@ -156,6 +156,63 @@ describe('join: fillGaps', () => {
     const r = fillGaps({ records: [] });
     assert.equal(r.success, false);
   });
+
+  // ── 頻度自動検出テスト (Fix 4) ──
+
+  it('should auto-detect monthly frequency from YYYY-MM format', () => {
+    const r = fillGaps({
+      records: [
+        { time: '2024-01', value: 100 },
+        { time: '2024-03', value: 102 },
+      ],
+      expectedRange: { from: '2024', to: '2024' },
+      // frequency は省略 → 自動検出で 'month'
+    });
+    assert.equal(r.success, true);
+    // 1月〜12月で2月が欠損
+    assert.ok(r.data.gaps.includes('2024-02'), `Expected 2024-02 in gaps: ${r.data.gaps}`);
+  });
+
+  it('should auto-detect yearly frequency from YYYY format', () => {
+    const r = fillGaps({
+      records: [
+        { time: '2020', value: 100 },
+        { time: '2023', value: 103 },
+      ],
+      expectedRange: { from: '2020', to: '2023' },
+    });
+    assert.equal(r.success, true);
+    assert.ok(r.data.gaps.includes('2021'));
+    assert.ok(r.data.gaps.includes('2022'));
+  });
+
+  it('should auto-detect quarterly frequency from YYYYQn format', () => {
+    const r = fillGaps({
+      records: [
+        { time: '2024Q1', value: 100 },
+        { time: '2024Q4', value: 103 },
+      ],
+      expectedRange: { from: '2024', to: '2024' },
+    });
+    assert.equal(r.success, true);
+    assert.ok(r.data.gaps.includes('2024Q2'));
+    assert.ok(r.data.gaps.includes('2024Q3'));
+  });
+
+  it('should prefer explicit frequency over auto-detection', () => {
+    // Data looks monthly but we force yearly
+    const r = fillGaps({
+      records: [
+        { time: '2024-01', value: 100 },
+        { time: '2024-06', value: 106 },
+      ],
+      expectedRange: { from: '2024', to: '2024' },
+      frequency: 'year',
+    });
+    assert.equal(r.success, true);
+    // With yearly freq, only "2024" expected, so gaps should not include monthly entries
+    assert.equal(r.data.gaps.length, 1); // only "2024" expected and neither record matches "2024"
+  });
 });
 
 // ═══ fetchAligned ═══

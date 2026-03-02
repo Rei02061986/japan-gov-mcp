@@ -68,7 +68,7 @@ export async function fetchAligned(params: {
   const source = 'join/fetch_aligned';
 
   if (!params.indicators || params.indicators.length === 0) {
-    return createError(source, 'indicators is required (at least 1)');
+    return createError(source, '指標(indicators)を1つ以上指定してください');
   }
 
   // Resolve time axis
@@ -210,10 +210,10 @@ export function normalize(params: {
 }): ApiResponse {
   const source = 'join/normalize';
   if (!params.data || params.data.length === 0) {
-    return createError(source, 'data is required');
+    return createError(source, '変換対象のデータ(data)が必要です');
   }
   if (!params.rules || params.rules.length === 0) {
-    return createError(source, 'rules is required');
+    return createError(source, '変換ルール(rules)が必要です');
   }
 
   const log: string[] = [];
@@ -257,6 +257,16 @@ export function normalize(params: {
 
 // ═══ fill_gaps ═══
 
+/** データの period フォーマットから頻度を自動検出 */
+function detectFrequency(records: Array<{ time: string }>): 'year' | 'month' | 'quarter' | 'day' {
+  if (records.length === 0) return 'year';
+  const sample = records[0].time;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(sample)) return 'day';
+  if (/^\d{4}-\d{2}$/.test(sample)) return 'month';
+  if (/^\d{4}Q\d$/.test(sample)) return 'quarter';
+  return 'year';
+}
+
 /**
  * 時系列の欠損を検知（補完はしない）
  */
@@ -267,10 +277,10 @@ export function fillGaps(params: {
 }): ApiResponse {
   const source = 'join/fill_gaps';
   if (!params.records || params.records.length === 0) {
-    return createError(source, 'records is required');
+    return createError(source, 'データレコードが必要です');
   }
 
-  const freq = params.frequency || 'year';
+  const freq = params.frequency || detectFrequency(params.records);
 
   // Parse existing times
   const existingTimes = new Set(params.records.map(r => r.time));
