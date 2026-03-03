@@ -55,6 +55,46 @@ const C = {
   mlitDpf:    { apiKey: process.env.MLIT_DPF_API_KEY || '' } as mlitDpf.MlitDpfConfig,
 };
 
+// ── Source attribution (利用規約に基づくクレジット表示) ──
+const ATTRIBUTION: Record<string, string> = {
+  'e-Stat': '出典：政府統計の総合窓口(e-Stat)（https://www.e-stat.go.jp/）',
+  'dashboard': '出典：統計ダッシュボード（https://dashboard.e-stat.go.jp/）',
+  'BOJ': '出典：日本銀行時系列統計データ検索サイト（https://www.stat-search.boj.or.jp/）',
+  'NDB': '出典：厚生労働省 NDBオープンデータ（https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000177182.html）',
+  'houjin': '出典：国税庁法人番号公表サイト（https://www.houjin-bangou.nta.go.jp/）',
+  'gBizINFO': '出典：gBizINFO（経済産業省）（https://info.gbiz.go.jp/）',
+  'EDINET': '出典：EDINET閲覧（提出）サイト（https://disclosure2.edinet-fsa.go.jp/）',
+  'JMA': '出典：気象庁ホームページ（https://www.jma.go.jp/）',
+  'J-SHIS': '出典：J-SHIS 地震ハザードステーション（https://www.j-shis.bosai.go.jp/）',
+  'flood': '出典：国土地理院ウェブサイト（https://www.gsi.go.jp/）',
+  'JARTIC': '出典：JARTIC交通量データ（CC BY 4.0）（https://www.jartic-open-traffic.org/）',
+  'e-Laws': '出典：e-Gov法令検索（https://laws.e-gov.go.jp/）',
+  'kokkai': '出典：国立国会図書館 国会会議録検索システム（https://kokkai.ndl.go.jp/）',
+  'pubcomment': '出典：e-Govパブリック・コメント（https://public-comment.e-gov.go.jp/）',
+  'GSI': '出典：国土地理院ウェブサイト（https://www.gsi.go.jp/）',
+  'PLATEAU': '出典：国土交通省 PLATEAU（https://www.mlit.go.jp/plateau/）',
+  'geoshape': '出典：歴史的行政区域データセットβ版（CODH作成）',
+  'NDL': '出典：国立国会図書館サーチ（https://ndlsearch.ndl.go.jp/）',
+  'J-STAGE': '出典：J-STAGE（https://www.jstage.jst.go.jp/） Powered by J-STAGE',
+  'CiNii': '出典：CiNii Research（https://cir.nii.ac.jp/）',
+  'JapanSearch': '出典：ジャパンサーチ（https://jpsearch.go.jp/）',
+  'data.go.jp': '出典：e-Govデータポータル（https://data.e-gov.go.jp/）',
+  'G-space': '出典：G空間情報センター（https://www.geospatial.jp/）',
+  'MLIT-DPF': '出典：国土交通データプラットフォーム（https://www.mlit-data.jp/）',
+  'travel-safety': '出典：外務省 海外安全ホームページ（https://www.anzen.mofa.go.jp/）',
+  'procurement': '出典：調達ポータル（https://www.p-portal.go.jp/）',
+  'realestate': '出典：国土交通省 不動産情報ライブラリ（https://www.reinfolib.mlit.go.jp/）',
+  'soramame': '出典：環境省 そらまめくん（https://soramame.env.go.jp/）',
+  'GSJ': '出典：産総研 地質調査総合センター（https://www.gsj.jp/）',
+  'JAXA': '出典：JAXA Earth API（https://data.earth.jaxa.jp/）',
+  'AgriKnowledge': '出典：AgriKnowledge（https://agriknowledge.affrc.go.jp/）',
+  'IRDB': '出典：IRDB 学術機関リポジトリデータベース（https://irdb.nii.ac.jp/）',
+  'researchmap': '出典：researchmap（https://researchmap.jp/）',
+  'mirasapo': '出典：ミラサポplus（https://mirasapo-plus.go.jp/）',
+  'kkj': '出典：官公需情報ポータルサイト（https://www.kkj.go.jp/）',
+  'hellowork': '出典：ハローワーク（https://www.hellowork.mhlw.go.jp/）',
+};
+
 // ── Response helpers ──
 const MAX = 4000;
 
@@ -82,11 +122,13 @@ function smartTrim(d: any, limit: number, depth = 0): any {
 
 function ok(r: ApiResponse, limit = 20) {
   if (!r.success) return { content: [{ type: 'text' as const, text: `ERR ${r.source}: ${r.error}` }] };
+  const attr = r.source ? ATTRIBUTION[r.source] : undefined;
   let s = JSON.stringify(smartTrim(r.data, limit));
   if (s.length > MAX) s = JSON.stringify(smartTrim(r.data, Math.min(limit, 10)));
   if (s.length > MAX) s = JSON.stringify(smartTrim(r.data, 5));
   if (s.length > MAX) s = JSON.stringify(smartTrim(r.data, 3));
   if (s.length > MAX) s = s.slice(0, MAX) + '\u2026';
+  if (attr) s += `\n\n${attr}`;
   return { content: [{ type: 'text' as const, text: s }] };
 }
 

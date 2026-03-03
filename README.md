@@ -183,6 +183,65 @@ npm test            # Run tests
 npm run inspect     # MCP Inspector GUI
 ```
 
+## Data Sources and Credits
+
+This project integrates data from the following Japanese government APIs. All data usage complies with each provider's terms of service.
+
+### License Framework
+
+Most Japanese government APIs use one of these standard licenses:
+
+| License | CC BY 4.0 Compatible | Commercial Use |
+|---------|:---------------------:|:--------------:|
+| [政府標準利用規約（第2.0版）](https://cio.go.jp/sites/default/files/uploads/documents/opendata_nijiriyou_betten1.pdf) | Yes | Yes |
+| [公共データ利用規約 PDL 1.0](https://www.digital.go.jp/en/resources/open_data/public_data_license_v1.0) | Yes | Yes |
+
+### Required Credits
+
+The following credit statements are required when using data from these APIs:
+
+> **e-Stat**: このサービスは、政府統計総合窓口(e-Stat)のAPI機能を使用していますが、サービスの内容は国によって保証されたものではありません。
+>
+> **統計ダッシュボード**: このサービスは、統計ダッシュボードのAPI機能を使用していますが、サービスの内容は国によって保証されたものではありません。
+>
+> **BOJ時系列統計**: このサービスは、日本銀行時系列統計データ検索サイトのAPI機能を使用しています。サービスの内容は日本銀行によって保証されたものではありません。
+>
+> **法人番号**: このサービスは、国税庁法人番号システムWeb-API機能を利用して取得した情報をもとに作成しているが、サービスの内容は国税庁によって保証されたものではない。
+>
+> **不動産情報ライブラリ**: このサービスは、国土交通省不動産情報ライブラリのAPI機能を使用していますが、提供情報の最新性、正確性、完全性等が保証されたものではありません。
+>
+> **MLIT DPF**: このサービスは、国土交通データプラットフォームのAPI機能を使用していますが、最新のデータを保証するものではありません。
+
+### Data Providers
+
+| Provider | API | License |
+|----------|-----|---------|
+| 総務省 | e-Stat, 統計ダッシュボード | 政府標準利用規約2.0 / PDL 1.0 |
+| 日本銀行 | BOJ時系列統計 | 独自規約 |
+| 厚生労働省 | NDBオープンデータ | PDL 1.0 |
+| 国税庁 | 法人番号 | 独自規約 |
+| 経済産業省/デジタル庁 | gBizINFO | 政府標準利用規約2.0 |
+| 金融庁 | EDINET | PDL 1.0 |
+| 気象庁 | 天気予報, 地震・津波 | 政府標準利用規約2.0 |
+| 防災科研 | J-SHIS | 独自規約 |
+| 国土地理院 | ジオコーディング, 浸水ナビ | GSI利用規約 (CC BY互換) |
+| 日本道路交通情報センター | JARTIC交通量 | CC BY 4.0 |
+| デジタル庁 | e-Laws法令API | 政府標準利用規約2.0 |
+| 国立国会図書館 | 国会会議録, NDLサーチ | PDL 1.0 |
+| e-Gov | パブリックコメント | 政府標準利用規約2.0 |
+| 国交省 | PLATEAU, 不動産, DPF | PDL 1.0 / 独自 |
+| JST | J-STAGE | 独自規約 |
+| NII | CiNii, IRDB, Geoshape | 独自 / CC BY 4.0 |
+| 国立国会図書館/文化庁 | ジャパンサーチ | CC0 / CC BY 4.0 |
+| 外務省 | 海外安全情報 | PDL 1.0 |
+| 環境省 | そらまめくん | PDL 1.0 |
+| 産総研 | 地質図Navi | 政府標準利用規約2.0 |
+| JAXA | JAXA Earth API | 独自規約 |
+| 農研機構 | AgriKnowledge | 独自規約（非営利のみ） |
+| 中小企業庁 | ミラサポplus | PDL 1.0 |
+
+For the complete terms of use analysis, see [REPORT-api-terms.md](./REPORT-api-terms.md).
+
 ## Disclaimer
 
 - This project is **not affiliated with or endorsed by** the Japanese government or any of its agencies.
@@ -190,8 +249,9 @@ npm run inspect     # MCP Inspector GUI
 - Government APIs may change, rate-limit, or discontinue without notice.
 - This software is provided "as is" — see [LICENSE](./LICENSE) for details.
 - **Do not use government statistics as the sole basis for critical decisions** without verifying against official sources.
+- Data from each API is subject to that provider's terms of use. Users of this MCP server are responsible for complying with applicable terms when using the retrieved data.
 
-> 本プロジェクトは日本政府・各省庁とは無関係の非公式ツールです。取得データの正確性・完全性・可用性は保証しません。政府APIは予告なく変更・停止される場合があります。重要な意思決定には必ず公式情報源を確認してください。
+> 本プロジェクトは日本政府・各省庁とは無関係の非公式ツールです。取得データの正確性・完全性・可用性は保証しません。政府APIは予告なく変更・停止される場合があります。重要な意思決定には必ず公式情報源を確認してください。各APIのデータはそれぞれの提供元の利用規約に従います。
 
 ## License
 

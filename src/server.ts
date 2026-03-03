@@ -34,7 +34,12 @@ const httpServer = createHttpServer(async (req: IncomingMessage, res: ServerResp
   // Health check
   if (req.url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'ok', version: '3.3.0', tools: 13 }));
+    res.end(JSON.stringify({
+      status: 'ok',
+      version: '3.3.0',
+      tools: 13,
+      disclaimer: 'This service integrates Japanese government APIs. Data is subject to each provider\'s terms of use. Not affiliated with or endorsed by the Japanese government.',
+    }));
     return;
   }
 
