@@ -37,6 +37,7 @@ import * as mlitDpf from './providers/mlit-dpf.js';
 import * as disaster from './providers/disaster.js';
 import * as ndb from './providers/ndb.js';
 import * as boj from './providers/boj.js';
+import * as tourism from './providers/tourism.js';
 import type { ApiResponse } from './utils/http.js';
 import { logRequest } from './lib/logger.js';
 import * as resolve from './providers/resolve.js';
@@ -93,6 +94,9 @@ const ATTRIBUTION: Record<string, string> = {
   'mirasapo': '出典：ミラサポplus（https://mirasapo-plus.go.jp/）',
   'kkj': '出典：官公需情報ポータルサイト（https://www.kkj.go.jp/）',
   'hellowork': '出典：ハローワーク（https://www.hellowork.mhlw.go.jp/）',
+  'JNTO': '出典：日本政府観光局(JNTO)（https://www.jnto.go.jp/statistics/）',
+  '観光庁/確報': '出典：観光庁 宿泊旅行統計調査（https://www.mlit.go.jp/kankocho/siryou/toukei/shukuhakutoukei.html）',
+  '観光庁/推移表': '出典：観光庁 宿泊旅行統計調査（https://www.mlit.go.jp/kankocho/siryou/toukei/shukuhakutoukei.html）',
 };
 
 // ── Response helpers ──
@@ -268,7 +272,7 @@ function summarizeKokkai(r: ApiResponse, limit: number) {
 // ── createServer ──
 
 export function createServer(): McpServer {
-  const server = new McpServer({ name: 'japan-gov-mcp', version: '3.3.0' });
+  const server = new McpServer({ name: 'japan-gov-mcp', version: '3.4.0' });
 
   // Logging middleware
   {
@@ -326,13 +330,14 @@ export function createServer(): McpServer {
 
   // ═══ 2. stats ═══
   server.tool('stats', '【統計】GDP/CPI/失業率(dash) 金利/マネー/物価(boj) 特定健診(ndb)。dashはリアルタイム経済指標、bojは日銀時系列、ndbは健診データ', {
-    action: z.enum(['dash_list', 'dash_data', 'boj_codes', 'boj_data', 'ndb_stats', 'ndb_items', 'ndb_areas']).describe('dash_list:指標一覧, dash_data:指標データ, boj_codes:日銀コード一覧, boj_data:日銀時系列, ndb_stats:健診データ, ndb_items:検査項目一覧, ndb_areas:地域一覧'),
+    action: z.enum(['dash_list', 'dash_data', 'boj_codes', 'boj_data', 'boj_fx', 'ndb_stats', 'ndb_items', 'ndb_areas']).describe('dash_list:指標一覧, dash_data:指標データ, boj_codes:日銀コード一覧, boj_data:日銀時系列, boj_fx:為替レート(USD_JPY/EUR_JPY/EUR_USD), ndb_stats:健診データ, ndb_items:検査項目一覧, ndb_areas:地域一覧'),
     code: z.string().optional().describe('dash_data:指標コード/boj_data:系列コード(boj_codesで確認)/ndb_stats:検査項目名(例:BMI,収縮期血圧)'),
-    db: z.string().optional().describe('日銀DB(FM01=金融市場,MD01=マネタリーベース,MD02=マネーストック,PR01=企業物価,PR02=サービス価格,CO=短観)'),
+    db: z.string().optional().describe('日銀DB(FM01=金融市場,FM08=外国為替,MD01=マネタリーベース,MD02=マネーストック,PR01=企業物価,PR02=サービス価格,CO=短観)'),
     region: z.string().optional().describe('dash_data:地域コード/ndb_stats:都道府県名'),
     from: z.string().optional().describe('開始(dash:時間コード, boj:YYYYMM形式)'),
     to: z.string().optional().describe('終了(同上)'),
     freq: z.string().optional().describe('日銀頻度: D=日次,M=月次,Q=四半期,A=年次'),
+    pair: z.enum(['USD_JPY', 'EUR_JPY', 'EUR_USD']).optional().describe('boj_fx:通貨ペア(EUR_JPYはクロスレート自動算出)'),
     areaType: z.enum(['prefecture', 'secondary_medical_area']).optional(),
     gender: z.enum(['M', 'F', 'all']).optional(),
     ageGroup: z.string().optional().describe('年齢区分(例: 40-44)'),
@@ -344,6 +349,7 @@ export function createServer(): McpServer {
       case 'dash_data': return safeOk(getDashboardData({ indicatorCode: p.code!, regionCode: p.region, timeCdFrom: p.from, timeCdTo: p.to }), 'Dashboard', lim);
       case 'boj_codes': return ok(await boj.getMajorStatistics(), lim);
       case 'boj_data': return safeOk(boj.getTimeSeriesData({ seriesCode: p.code!, db: p.db, freq: p.freq, startDate: p.from, endDate: p.to }), 'BOJ', lim);
+      case 'boj_fx': return safeOk(boj.getExchangeRate({ pair: p.pair || 'USD_JPY', freq: p.freq, startDate: p.from, endDate: p.to }), 'BOJ/FX', lim);
       case 'ndb_stats': return safeOk(ndb.getInspectionStats({ itemName: p.code!, areaType: p.areaType, prefectureName: p.region, gender: p.gender, ageGroup: p.ageGroup }), 'NDB', lim);
       case 'ndb_items': return safeOk(ndb.getItems(), 'NDB', lim);
       case 'ndb_areas': return safeOk(ndb.getAreas({ type: p.areaType }), 'NDB', lim);
@@ -583,6 +589,28 @@ export function createServer(): McpServer {
       case 'trend_context': return safeOk(context.trendContext({ source: p.source!, id: p.id, query: p.query, area: p.area, lookback_years: p.lookbackYears, recent_n: p.recentN }, { estat: C.estat }), 'context/trend', 20, ESTAT_TIMEOUT);
       case 'annotate': return safeOk(context.annotate({ joined_data: p.joinedData as any, depth: p.depth }, { estat: C.estat }), 'context/annotate', 20, ESTAT_TIMEOUT);
       case 'suggest': return ok(context.suggest({ topic: p.topic, current_indicators: p.currentIndicators, alerts: p.alerts, area_level: p.areaLevel, unique_areas: p.uniqueAreas }));
+    }
+  });
+
+  // ═══ 14. tourism ═══
+  server.tool('tourism', '【観光統計】JNTO訪日外客数(jnto)/観光庁宿泊統計の国籍×都道府県(kakuho)/外国人宿泊推移(suikei)/データカタログ(catalog)。フランス人×京都等の分析に最適', {
+    action: z.enum(['jnto', 'kakuho', 'suikei', 'catalog']).describe('jnto:JNTO訪日外客数(国籍別月次), kakuho:確報(21国籍×47都道府県), suikei:推移表(外国人宿泊時系列), catalog:利用可能データ一覧'),
+    year: z.number().optional().describe('対象年(kakuho: 2015-2024, jnto: 2003-2026)'),
+    yearFrom: z.number().optional().describe('開始年'),
+    yearTo: z.number().optional().describe('終了年'),
+    month: z.number().optional().describe('月(1-12, kakuhoで月別データ取得時)'),
+    country: z.string().optional().describe('jnto: 国名フィルタ(例: フランス)'),
+    prefecture: z.string().optional().describe('都道府県(コード01-47 or 名前)'),
+    nationality: z.string().optional().describe('kakuho: 国籍フィルタ(例: フランス,韓国,中国,台湾,米国,英国等21区分)'),
+    monthly: z.boolean().optional().describe('suikei: true=月別データ'),
+    limit: z.number().optional(),
+  }, async (p) => {
+    const lim = p.limit || 20;
+    switch (p.action) {
+      case 'catalog': return ok(tourism.getCatalog());
+      case 'jnto': return safeOk(tourism.getJntoVisitors({ year: p.year, country: p.country, yearFrom: p.yearFrom, yearTo: p.yearTo }), 'JNTO', lim, 60000);
+      case 'kakuho': return safeOk(tourism.getKakuhoNationality({ year: p.year || 2024, month: p.month, prefecture: p.prefecture, nationality: p.nationality }), '観光庁/確報', lim, 60000);
+      case 'suikei': return safeOk(tourism.getSuikeiTrend({ prefecture: p.prefecture, yearFrom: p.yearFrom, yearTo: p.yearTo, monthly: p.monthly }), '観光庁/推移表', lim, 60000);
     }
   });
 

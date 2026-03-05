@@ -80,12 +80,141 @@ export async function getMajorStatistics(): Promise<ApiResponse> {
     m2: { code: 'MAM1NAM2M2MO', db: 'MD02', freq: 'M', description: 'M2マネーストック' },
     corporate_goods_price: { code: 'PRCG20_2200000000', db: 'PR01', freq: 'M', description: '国内企業物価指数（総平均）' },
     services_price: { code: 'PRCS20_5200000000', db: 'PR02', freq: 'M', description: 'サービス価格指数（総平均）' },
+    usd_jpy_monthly: { code: 'FXERM07', db: 'FM08', freq: 'M', description: 'ドル/円 東京市場スポット17時(月中平均)' },
+    usd_jpy_daily: { code: 'FXERD04', db: 'FM08', freq: 'D', description: 'ドル/円 東京市場スポット17時(日次)' },
+    eur_usd_daily: { code: 'FXERD31', db: 'FM08', freq: 'D', description: 'ユーロ/ドル 東京市場スポット9時(日次)' },
   };
 
   return {
     success: true,
     data: majorCodes,
     source: '日銀/major_statistics',
+    timestamp: new Date().toISOString(),
+  };
+}
+
+/** 為替レート取得（EUR/JPYはクロスレートを日次から算出→月次集約） */
+export async function getExchangeRate(params: {
+  pair: 'USD_JPY' | 'EUR_JPY' | 'EUR_USD';
+  freq?: string;
+  startDate?: string;
+  endDate?: string;
+}): Promise<ApiResponse> {
+  const freq = params.freq || 'M';
+  const startDate = params.startDate;
+  const endDate = params.endDate;
+
+  if (params.pair === 'USD_JPY') {
+    // Monthly available directly
+    const code = freq === 'D' ? 'FXERD04' : 'FXERM07';
+    return getTimeSeriesData({ seriesCode: code, db: 'FM08', freq, startDate, endDate });
+  }
+  if (params.pair === 'EUR_USD') {
+    // Daily only (no monthly series exists)
+    return getTimeSeriesData({ seriesCode: 'FXERD31', db: 'FM08', freq: 'D', startDate, endDate });
+  }
+
+  // EUR/JPY = USD/JPY × EUR/USD (both from daily, then aggregate to monthly)
+  const [usdJpy, eurUsd] = await Promise.allSettled([
+    getTimeSeriesData({ seriesCode: 'FXERD04', db: 'FM08', freq: 'D', startDate, endDate }),
+    getTimeSeriesData({ seriesCode: 'FXERD31', db: 'FM08', freq: 'D', startDate, endDate }),
+  ]);
+  if (usdJpy.status === 'rejected') return createError('日銀/fx', `USD/JPY取得失敗: ${usdJpy.reason}`);
+  if (eurUsd.status === 'rejected') return createError('日銀/fx', `EUR/USD取得失敗: ${eurUsd.reason}`);
+  if (!usdJpy.value.success) return usdJpy.value;
+  if (!eurUsd.value.success) return eurUsd.value;
+
+  // Extract data arrays from BOJ response format
+  // BOJ v1 format: { RESULTSET: [{ VALUES: { SURVEY_DATES: [20240101,...], VALUES: [143.38,...] } }] }
+  function extractRates(data: any): Array<{ date: string; value: number }> {
+    const results: Array<{ date: string; value: number }> = [];
+    const rs = data?.RESULTSET;
+    if (Array.isArray(rs) && rs.length > 0) {
+      const dates = rs[0]?.VALUES?.SURVEY_DATES || [];
+      const vals = rs[0]?.VALUES?.VALUES || [];
+      for (let i = 0; i < dates.length; i++) {
+        const date = String(dates[i]);
+        const val = typeof vals[i] === 'number' ? vals[i] : parseFloat(String(vals[i] || ''));
+        if (!isNaN(val) && val > 0) results.push({ date, value: val });
+      }
+      return results;
+    }
+    // Fallback for other possible formats
+    const arr = data?.DataCode || data?.data_list?.data || [];
+    if (!Array.isArray(arr)) return results;
+    for (const d of arr) {
+      const date = d.date || d.DATE || d.TIME || '';
+      const raw = d.value ?? d.OBS_VALUE ?? d.VALUE ?? '';
+      const val = parseFloat(String(raw));
+      if (date && !isNaN(val) && val > 0) results.push({ date: String(date), value: val });
+    }
+    return results;
+  }
+
+  const usdRates = extractRates(usdJpy.value.data);
+  const eurRates = extractRates(eurUsd.value.data);
+
+  // Build lookup: date → USD/JPY rate
+  const usdMap = new Map<string, number>();
+  for (const r of usdRates) usdMap.set(r.date, r.value);
+
+  // Compute daily cross rates
+  const dailyCross: Array<{ date: string; usd_jpy: number; eur_usd: number; eur_jpy: number }> = [];
+  for (const r of eurRates) {
+    const usdJpyVal = usdMap.get(r.date);
+    if (usdJpyVal) {
+      dailyCross.push({
+        date: r.date,
+        usd_jpy: usdJpyVal,
+        eur_usd: r.value,
+        eur_jpy: Math.round(usdJpyVal * r.value * 100) / 100,
+      });
+    }
+  }
+
+  // Aggregate to monthly if requested
+  if (freq !== 'D') {
+    const monthly = new Map<string, { sum_usd: number; sum_eur_usd: number; sum_eur_jpy: number; count: number }>();
+    for (const d of dailyCross) {
+      const ym = d.date.slice(0, 6); // YYYYMM
+      const m = monthly.get(ym) || { sum_usd: 0, sum_eur_usd: 0, sum_eur_jpy: 0, count: 0 };
+      m.sum_usd += d.usd_jpy;
+      m.sum_eur_usd += d.eur_usd;
+      m.sum_eur_jpy += d.eur_jpy;
+      m.count++;
+      monthly.set(ym, m);
+    }
+    const monthlyRates = [...monthly.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([ym, m]) => ({
+      date: ym,
+      usd_jpy: Math.round(m.sum_usd / m.count * 100) / 100,
+      eur_usd: Math.round(m.sum_eur_usd / m.count * 10000) / 10000,
+      eur_jpy: Math.round(m.sum_eur_jpy / m.count * 100) / 100,
+    }));
+
+    return {
+      success: true,
+      data: {
+        pair: 'EUR/JPY',
+        method: 'cross_rate (USD/JPY × EUR/USD, daily→monthly average)',
+        frequency: 'monthly',
+        count: monthlyRates.length,
+        rates: monthlyRates,
+      },
+      source: '日銀/fx',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  return {
+    success: true,
+    data: {
+      pair: 'EUR/JPY',
+      method: 'cross_rate (USD/JPY × EUR/USD)',
+      frequency: 'daily',
+      count: dailyCross.length,
+      rates: dailyCross,
+    },
+    source: '日銀/fx',
     timestamp: new Date().toISOString(),
   };
 }

@@ -1,6 +1,6 @@
 {
   "name": "japan-gov-mcp",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "MCP server integrating 36 Japanese government APIs — statistics (e-Stat), corporate data, weather, legislation, geospatial, and more. With intelligent code resolution, data joining, contextual analysis, and AI-driven navigation.",
   "type": "module",
   "bin": {
@@ -17,10 +17,20 @@
     "inspect": "npx @modelcontextprotocol/inspector node build/index.js",
     "prepublishOnly": "npm run build && npm test"
   },
-  "files": ["build"],
+  "files": [
+    "build"
+  ],
   "keywords": [
-    "mcp", "mcp-server", "japan", "government", "statistics",
-    "e-stat", "resas", "opendata", "api", "claude"
+    "mcp",
+    "mcp-server",
+    "japan",
+    "government",
+    "statistics",
+    "e-stat",
+    "resas",
+    "opendata",
+    "api",
+    "claude"
   ],
   "license": "MIT",
   "author": "Agentic Governance",
@@ -37,6 +47,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
+    "xlsx": "^0.18.5",
     "zod": "^3.24.4"
   },
   "devDependencies": {

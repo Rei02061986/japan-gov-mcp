@@ -36,8 +36,8 @@ const httpServer = createHttpServer(async (req: IncomingMessage, res: ServerResp
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       status: 'ok',
-      version: '3.3.0',
-      tools: 13,
+      version: '3.4.0',
+      tools: 14,
       disclaimer: 'This service integrates Japanese government APIs. Data is subject to each provider\'s terms of use. Not affiliated with or endorsed by the Japanese government.',
     }));
     return;
@@ -73,7 +73,7 @@ const httpServer = createHttpServer(async (req: IncomingMessage, res: ServerResp
 });
 
 httpServer.listen(PORT, HOST, () => {
-  console.error(`japan-gov-mcp v3.3 (13 tools) [http] listening on ${HOST}:${PORT}`);
+  console.error(`japan-gov-mcp v3.4 (14 tools) [http] listening on ${HOST}:${PORT}`);
   console.error(`  Health: http://${HOST}:${PORT}/health`);
   console.error(`  MCP:    http://${HOST}:${PORT}/mcp`);
 });
