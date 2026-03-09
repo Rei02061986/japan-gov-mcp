@@ -30,6 +30,7 @@ export async function getResearcherAchievements(params: {
   });
   return fetchJson(url, {
     source: 'researchmap/achievements',
+    timeout: 45000,
     cacheTtl: CacheTTL.SEARCH,
   });
 }

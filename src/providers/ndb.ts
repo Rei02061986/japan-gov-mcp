@@ -51,6 +51,7 @@ export async function getInspectionStats(params: {
 
   return fetchJson<unknown>(url, {
     source,
+    timeout: 45000,
     cacheTtl: CacheTTL.DATA, // 統計データは中期キャッシュ
   });
 }
@@ -109,6 +110,7 @@ export async function getRangeLabels(params: {
 
   return fetchJson<unknown>(url, {
     source,
+    timeout: 45000,
     cacheTtl: CacheTTL.MASTER,
   });
 }

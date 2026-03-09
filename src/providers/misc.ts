@@ -97,6 +97,7 @@ export async function getDashboardIndicators(params: {
   });
   return fetchJson<DashboardResponse>(url, {
     source: '統計ダッシュボード/indicatorInfo',
+    timeout: 45000,
     headers: DASHBOARD_HEADERS,
   });
 }
@@ -120,6 +121,7 @@ export async function getDashboardData(params: {
   });
   return fetchJson<DashboardResponse>(url, {
     source: '統計ダッシュボード/statsData',
+    timeout: 45000,
     headers: DASHBOARD_HEADERS,
   });
 }
@@ -250,6 +252,7 @@ export async function getSafetyInfo(params: {
       : `${ANZEN_BASE}/area/newarrival.xml`;
   return fetchXml(url, {
     source: '海外安全情報',
+    timeout: 45000,
     cacheTtl: params.countryCode || params.regionCode ? CacheTTL.DATA : CacheTTL.MASTER,
   });
 }

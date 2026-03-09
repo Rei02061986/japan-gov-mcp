@@ -3,6 +3,22 @@
  * 全Providerが使用する統一的なHTTPクライアント
  */
 
+/** データ品質メタデータ */
+export interface DataQualityMeta {
+  /** 指標コードと単位のマッピング */
+  units?: Record<string, string>;
+  /** 調査年情報 */
+  surveyYear?: string;
+  /** 調査名 */
+  surveyName?: string;
+  /** 秘匿フラグ（データが秘匿されている指標） */
+  suppressed?: string[];
+  /** 合併警告 */
+  mergerWarnings?: { code: string; name: string; message: string }[];
+  /** データ制約・注記 */
+  notes?: string[];
+}
+
 /** 全APIレスポンスの統一型 */
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -11,6 +27,8 @@ export interface ApiResponse<T = any> {
   source: string;
   timestamp: string;
   cached?: boolean;
+  /** データ品質メタデータ（単位・調査年・秘匿フラグ・合併警告等） */
+  meta?: DataQualityMeta;
 }
 
 /** エラーレスポンスを生成する共通ヘルパー */
@@ -222,7 +240,7 @@ export async function fetchJson<T = any>(
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), options.timeout || 40000);
+  const timeoutId = setTimeout(() => controller.abort(), options.timeout || 30000);
 
   try {
     const res = await fetchWithRateLimit(url, {
@@ -273,7 +291,7 @@ export async function fetchXml(
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), options.timeout || 40000);
+  const timeoutId = setTimeout(() => controller.abort(), options.timeout || 30000);
 
   try {
     const res = await fetchWithRateLimit(url, {
@@ -320,4 +338,39 @@ export function buildUrl(base: string, params: Record<string, string | number | 
     }
   }
   return url.toString();
+}
+
+// ═══════════════════════════════════════════════
+// Input Sanitization Utilities
+// ═══════════════════════════════════════════════
+
+/**
+ * 文字列サニタイズ — 制御文字・BOM・孤立サロゲート除去、長さ制限
+ * 全Providerの入力パラメータに適用推奨
+ */
+export function sanitizeString(value: string, maxLen: number = 200): string {
+  return value
+    .trim()
+    .replace(/[\x00-\x1F\x7F]/g, '')     // 制御文字除去
+    .replace(/[\uFEFF]/g, '')              // BOM除去
+    .replace(/[\uD800-\uDFFF]/g, '')       // 孤立サロゲート除去
+    .slice(0, maxLen);
+}
+
+/**
+ * 数値クランプ — min/max範囲に制限、undefinedや非有限値にはデフォルト値
+ */
+export function clampInt(value: number | undefined, min: number, max: number, defaultVal: number): number {
+  if (value === undefined || !Number.isFinite(value)) return defaultVal;
+  return Math.max(min, Math.min(max, Math.round(value)));
+}
+
+/**
+ * フォーマット検証 — 正規表現パターンに合致しない場合はApiResponseエラーを返す
+ */
+export function validateFormat(value: string, pattern: RegExp, fieldName: string, source: string): ApiResponse<never> | undefined {
+  if (!pattern.test(value)) {
+    return createError(source, `${fieldName} format invalid`);
+  }
+  return undefined;
 }

@@ -1,19 +1,16 @@
 {
   "name": "japan-gov-mcp",
-  "version": "3.4.0",
-  "description": "MCP server integrating 36 Japanese government APIs — statistics (e-Stat), corporate data, weather, legislation, geospatial, and more. With intelligent code resolution, data joining, contextual analysis, and AI-driven navigation.",
+  "version": "1.0.0",
+  "description": "日本政府API統合MCPサーバー - 30+ API / 90ツール（シナリオ複合9個）で中央省庁のオープンデータに統合アクセス",
   "type": "module",
   "bin": {
     "japan-gov-mcp": "./build/index.js"
   },
   "scripts": {
-    "build": "tsc && rm -rf build/data && cp -r src/data build/data 2>/dev/null; chmod 755 build/index.js",
+    "build": "./node_modules/.bin/tsc && chmod 755 build/index.js",
     "start": "node build/index.js",
-    "start:remote": "node build/server.js",
     "typecheck": "tsc --noEmit",
-    "test": "node --test 'tests/*.test.ts'",
-    "test:e2e": "node --test 'tests/e2e/**/*.test.ts'",
-    "test:all": "node --test 'tests/**/*.test.ts'",
+    "test": "node --test 'tests/**/*.test.ts'",
     "inspect": "npx @modelcontextprotocol/inspector node build/index.js",
     "prepublishOnly": "npm run build && npm test"
   },
@@ -33,25 +30,25 @@
     "claude"
   ],
   "license": "MIT",
-  "author": "Agentic Governance",
+  "author": "reikumaki",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Rei02061986/japan-gov-mcp.git"
+    "url": "git+https://github.com/reikumaki/japan-gov-mcp.git"
   },
-  "homepage": "https://github.com/Rei02061986/japan-gov-mcp#readme",
+  "homepage": "https://github.com/reikumaki/japan-gov-mcp#readme",
   "bugs": {
-    "url": "https://github.com/Rei02061986/japan-gov-mcp/issues"
+    "url": "https://github.com/reikumaki/japan-gov-mcp/issues"
   },
   "engines": {
     "node": ">=22"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
-    "xlsx": "^0.18.5",
     "zod": "^3.24.4"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.3"
   }
 }

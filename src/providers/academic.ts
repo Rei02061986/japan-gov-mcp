@@ -60,6 +60,7 @@ export async function searchJstage(params: {
   });
   return fetchXml(url, {
     source: 'J-STAGE/search',
+    timeout: 45000,
     cacheTtl: CacheTTL.SEARCH,
   });
 }

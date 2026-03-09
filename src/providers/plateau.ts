@@ -28,6 +28,7 @@ export async function searchPlateauDatasets(params: {
   });
   return fetchJson(url, {
     source: 'PLATEAU/search',
+    timeout: 60000,
     cacheTtl: CacheTTL.SEARCH,
   });
 }
@@ -46,6 +47,7 @@ export async function getPlateauCitygml(params: {
   });
   return fetchJson(url, {
     source: 'PLATEAU/citygml',
+    timeout: 60000,
     cacheTtl: CacheTTL.DATA,
   });
 }
